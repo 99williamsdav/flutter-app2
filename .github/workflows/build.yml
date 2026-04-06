@@ -41,7 +41,7 @@ jobs:
 
       - name: Download built APK
         run: |
-          APK_URL=$(eas build:list --platform android --status finished --limit 1 --json --non-interactive | jq -r '.[0].artifacts.buildUrl')
+          APK_URL=$(eas build:list --platform android --status finished --limit 1 --json --non-interactive | jq -r '.[0].artifacts.buildUrl // .[0].artifacts.url // empty')
           curl -L "$APK_URL" -o app-preview.apk
 
       - name: Upload APK artifact
