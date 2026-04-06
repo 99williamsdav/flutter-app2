@@ -4,11 +4,9 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const TODAY = () => {
   const d = new Date();
@@ -187,8 +185,8 @@ export default function HomeScreen() {
   const snowballStale = isStale(snowballTimestamp);
 
   const grossTotal =
-    normalData?.profit !== null && inplayData?.profit !== null && snowballData?.profit !== null
-      ? (normalData?.profit ?? 0) + (inplayData?.profit ?? 0) + (snowballData?.profit ?? 0)
+    normalData !== null && inplayData !== null && snowballData !== null
+      ? (normalData.profit ?? 0) + (inplayData.profit ?? 0) + (snowballData.profit ?? 0)
       : null;
 
   if (loading) {
