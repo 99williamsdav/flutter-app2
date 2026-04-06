@@ -89,7 +89,7 @@
           <div class="metric-value main">
             {{ formatCurrency(data.openStake) }}
           </div>
-          <div class="metric-value side">
+          <div class="metric-value side" *ngIf="data.openStake !== 0">
             ({{ formatCurrency(data.openAverageProfit, true) }})
           </div>
         </div>

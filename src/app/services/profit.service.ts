@@ -17,6 +17,13 @@ export interface OpenPosition {
   ShortStake: number;
   AverageProfit: number;
   LayValue: number;
+  Race: RaceData;
+}
+
+export interface RaceData {
+  Date: Date | string;
+  Venue: string;
+  Country: string;
 }
 
 export interface ProfitData {
@@ -51,6 +58,21 @@ export class ProfitService {
     return `${yyyy}-${mm}-${dd}`;
   }
 
+  private isRaceToday(raceDate: Date | string | null | undefined): boolean {
+    if (!raceDate) {
+      return false;
+    }
+
+    if (typeof raceDate === 'string') {
+      return raceDate.slice(0, 10) === this.getToday();
+    }
+
+    const yyyy = raceDate.getFullYear();
+    const mm = String(raceDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(raceDate.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}` === this.getToday();
+  }
+
   private fetchStats(baseUrl: string, extraFilter: string): Observable<StatsData> {
     const date = this.getToday();
     const dsFilters = `{${extraFilter}Void: false}`;
@@ -78,7 +100,9 @@ export class ProfitService {
           return { openStake: null, openAverageProfit: null };
         }
 
-        return bets.reduce(
+        const todaysBets = bets.filter(bet => this.isRaceToday(bet.Race?.Date));
+
+        return todaysBets.reduce(
           (acc, bet) => {
             acc.openStake += bet.LongShort === 'Long' ? (bet.LongStake ?? 0) : (bet.ShortStake ?? 0);
             acc.openAverageProfit += bet.AverageProfit ?? 0;
