@@ -1,0 +1,42 @@
+.metric-label {
+  font-size: 14px;
+  color: var(--ion-color-medium);
+  display: flex;
+  align-items: center;
+}
+
+.metric-value {
+  font-size: 16px;
+  font-weight: 600;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.metric-value.negative {
+  color: var(--ion-color-danger);
+}
+
+.metric-value.total {
+  font-size: 20px;
+}
+
+ion-card {
+  margin: 8px;
+}
+
+ion-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+}
+
+ion-row {
+  padding: 4px 0;
+  border-bottom: 1px solid var(--ion-color-light-shade);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}

@@ -1,0 +1,40 @@
+ion-list#inbox-list {
+  background: var(--ion-color-primary);
+
+  ion-list-header,
+  ion-note {
+    color: #fff;
+  }
+
+  ion-list-header {
+    font-size: 22px;
+    font-weight: 600;
+    min-height: 20px;
+    padding: 20px 16px 10px;
+  }
+
+  ion-note {
+    margin-bottom: 30px;
+  }
+
+  ion-item {
+    --color: #fff;
+    --background: var(--ion-color-primary);
+    border-radius: 4px;
+    margin: 4px 8px;
+
+    ion-icon {
+      color: #fff;
+    }
+  }
+
+  ion-item.selected {
+    --background: rgba(var(--ion-color-primary-rgb), 0.14);
+    --color: var(--ion-color-primary);
+    --border-radius: 4px;
+
+    ion-icon {
+      color: var(--ion-color-primary);
+    }
+  }
+}

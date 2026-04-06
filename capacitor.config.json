@@ -1,0 +1,8 @@
+{
+  "appId": "com.flutterbot.profittracker",
+  "appName": "FlutterBot Profit Tracker",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

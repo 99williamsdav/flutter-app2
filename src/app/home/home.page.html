@@ -1,0 +1,112 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Profit Tracker</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Normal Stats -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Normal</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" class="metric-label">Profit</ion-col>
+          <ion-col size="6" class="metric-value" [class.negative]="data.normalProfit !== null && data.normalProfit < 0">
+            {{ formatCurrency(data.normalProfit) }}{{ data.normalStale ? ' !' : '' }}
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6" class="metric-label">Cashout Value</ion-col>
+          <ion-col size="6" class="metric-value" [class.negative]="data.normalCashout !== null && data.normalCashout < 0">
+            {{ formatCurrency(data.normalCashout) }}
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Snowball Stats -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Snowball</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" class="metric-label">Profit</ion-col>
+          <ion-col size="6" class="metric-value" [class.negative]="data.snowballProfit !== null && data.snowballProfit < 0">
+            {{ formatCurrency(data.snowballProfit) }}{{ data.snowballStale ? ' !' : '' }}
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6" class="metric-label">Cashout</ion-col>
+          <ion-col size="6" class="metric-value" [class.negative]="data.snowballCashout !== null && data.snowballCashout < 0">
+            {{ formatCurrency(data.snowballCashout) }}
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- InPlay Stats -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>InPlay</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" class="metric-label">Profit</ion-col>
+          <ion-col size="6" class="metric-value" [class.negative]="data.inplayProfit !== null && data.inplayProfit < 0">
+            {{ formatCurrency(data.inplayProfit) }}{{ data.inplayStale ? ' !' : '' }}
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6" class="metric-label">Expected</ion-col>
+          <ion-col size="6" class="metric-value" [class.negative]="data.inplayExpected !== null && data.inplayExpected < 0">
+            {{ formatCurrency(data.inplayExpected) }}
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Summary -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Summary</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" class="metric-label">Gross Total</ion-col>
+          <ion-col size="6" class="metric-value total" [class.negative]="grossTotal !== null && grossTotal < 0">
+            {{ formatCurrency(grossTotal) }}
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6" class="metric-label">Open Stake</ion-col>
+          <ion-col size="6" class="metric-value" [class.negative]="data.openStake !== null && data.openStake < 0">
+            {{ formatCurrency(data.openStake) }}
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col size="6" class="metric-label">Last Updated</ion-col>
+          <ion-col size="6" class="metric-value">
+            {{ formatTime(data.lastUpdated) }}
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
