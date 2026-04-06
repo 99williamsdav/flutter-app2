@@ -1,103 +1,147 @@
-.metric-label {
-  font-size: 14px;
-  color: var(--ion-color-medium);
-  display: flex;
-  align-items: center;
+:host {
+  --page-bg: radial-gradient(circle at 12% 0%, #fff3db 0%, #f7f5f0 45%, #edf2fb 100%);
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(71, 84, 103, 0.12);
+  --text-muted: #667085;
+  --text-title: #243042;
+  --positive: #15803d;
+  --negative: #be123c;
 }
 
-.metric-value {
-  font-size: 16px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
+ion-content {
+  --background: var(--page-bg);
 }
 
-.metric-value.aligned-left {
-  font-size: 18px;
-  text-align: left;
-  justify-content: flex-start;
-}
-
-.metric-value.aligned-right {
-  font-size: 14px;
-  text-align: right;
-  justify-content: flex-end;
-}
-
-.metric-value.negative {
-  color: var(--ion-color-danger);
-}
-
-.metric-value.positive {
-  color: #2cb34a;
-}
-
-.cashout-value {
-  font-size: 14px;
-  opacity: 0.85;
-}
-
-.cashout-value.negative {
-  color: var(--ion-color-danger);
-}
-
-.cashout-value.positive {
-  color: #2cb34a;
-}
-
-.metric-value.total {
-  font-size: 24px;
-  font-weight: 700;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--ion-color-light-shade);
-}
-
-.gross-value {
-  font-size: 32px;
-  font-weight: 700;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.gross-value.negative {
-  color: var(--ion-color-danger);
-}
-
-.gross-value.positive {
-  color: #2cb34a;
+.home-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-bottom: 20px;
 }
 
 ion-card {
-  margin: 4px;
+  margin: 0;
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  background: var(--card-bg);
+  box-shadow: 0 12px 28px rgba(16, 24, 40, 0.08);
+  backdrop-filter: blur(4px);
 }
 
-ion-card-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--ion-color-primary);
-}
+.hero-card {
+  margin-bottom: 16px;
+  border: none;
 
-ion-row {
-  padding: 2px 0;
-  border-bottom: 1px solid var(--ion-color-light-shade);
+  &.gross-positive {
+    background: linear-gradient(130deg, #166534, #15803d 60%, #22c55e);
+  }
 
-  &:last-child {
-    border-bottom: none;
+  &.gross-negative {
+    background: linear-gradient(130deg, #881337, #be123c 58%, #e11d48);
+  }
+
+  &.gross-neutral {
+    background: linear-gradient(130deg, #111827, #374151 62%, #4b5563);
   }
 }
 
-.open-stake-row {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--ion-color-light-shade);
+.section-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+}
+
+.gross-value {
+  font-size: clamp(2rem, 6vw, 2.9rem);
+  font-weight: 800;
+  line-height: 1;
+  color: #f9fafb;
+}
+
+.gross-value.positive {
+  color: #dcfce7;
+}
+
+.gross-value.negative {
+  color: #ffe4e6;
+}
+
+.strategy-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+  margin-bottom: 16px;
+}
+
+.strategy-card ion-card-header,
+.open-stake-card ion-card-header {
+  padding-bottom: 6px;
+}
+
+ion-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-title);
+  letter-spacing: 0.02em;
+}
+
+.metric-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.metric-value {
+  font-weight: 700;
+  color: var(--text-title);
+}
+
+.metric-value.main {
+  font-size: clamp(1.3rem, 4.5vw, 1.8rem);
+}
+
+.metric-value.side {
+  font-size: clamp(0.9rem, 3vw, 1.05rem);
+  color: var(--text-muted);
+  padding-bottom: 3px;
+}
+
+.metric-value.positive {
+  color: var(--positive);
+}
+
+.metric-value.negative {
+  color: var(--negative);
+}
+
+.stale-indicator {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9a3412;
+  background: rgba(255, 237, 213, 0.8);
+  border: 1px solid rgba(251, 146, 60, 0.35);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+.open-stake-card {
+  margin-bottom: 8px;
 }
 
 .footnote {
-  font-size: 12px;
-  color: var(--ion-color-medium);
+  font-size: 0.78rem;
   text-align: center;
-  padding: 16px 8px;
-  margin-top: 8px;
+  color: var(--text-muted);
+  padding: 10px 6px;
+}
+
+@media (min-width: 700px) {
+  .strategy-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
