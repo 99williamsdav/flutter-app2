@@ -8,9 +8,19 @@
 .metric-value {
   font-size: 16px;
   font-weight: 600;
-  text-align: right;
   display: flex;
   align-items: center;
+}
+
+.metric-value.aligned-left {
+  font-size: 18px;
+  text-align: left;
+  justify-content: flex-start;
+}
+
+.metric-value.aligned-right {
+  font-size: 14px;
+  text-align: right;
   justify-content: flex-end;
 }
 
@@ -18,12 +28,49 @@
   color: var(--ion-color-danger);
 }
 
+.metric-value.positive {
+  color: #2cb34a;
+}
+
+.cashout-value {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.cashout-value.negative {
+  color: var(--ion-color-danger);
+}
+
+.cashout-value.positive {
+  color: #2cb34a;
+}
+
 .metric-value.total {
-  font-size: 20px;
+  font-size: 24px;
+  font-weight: 700;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--ion-color-light-shade);
+}
+
+.gross-value {
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gross-value.negative {
+  color: var(--ion-color-danger);
+}
+
+.gross-value.positive {
+  color: #2cb34a;
 }
 
 ion-card {
-  margin: 8px;
+  margin: 4px;
 }
 
 ion-card-title {
@@ -33,10 +80,24 @@ ion-card-title {
 }
 
 ion-row {
-  padding: 4px 0;
+  padding: 2px 0;
   border-bottom: 1px solid var(--ion-color-light-shade);
 
   &:last-child {
     border-bottom: none;
   }
+}
+
+.open-stake-row {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ion-color-light-shade);
+}
+
+.footnote {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  text-align: center;
+  padding: 16px 8px;
+  margin-top: 8px;
 }
