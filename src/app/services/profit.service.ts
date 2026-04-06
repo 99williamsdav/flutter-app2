@@ -11,7 +11,7 @@ export interface StatsData {
   stale: boolean;
 }
 
-export interface OpenBet {
+export interface OpenPosition {
   LongShort: 'Long' | 'Short';
   LongStake: number;
   ShortStake: number;
@@ -71,7 +71,7 @@ export class ProfitService {
 
   private fetchOpenBets(): Observable<number | null> {
     const url = `${this.flutterbotBase}/open`;
-    return this.http.get<OpenBet[]>(url).pipe(
+    return this.http.get<OpenPosition[]>(url).pipe(
       map(bets => {
         if (!bets || !Array.isArray(bets)) return null;
         return bets.reduce((sum, bet) => {
