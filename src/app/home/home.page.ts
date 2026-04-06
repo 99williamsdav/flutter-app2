@@ -91,11 +91,20 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
-  formatCurrency(value: number | null): string {
+  formatCurrency(value: number | null, includePositiveSign = false): string {
     if (value === null || value === undefined) return '£--.--';
     const abs = Math.abs(value);
     const formatted = abs.toFixed(2);
-    return value < 0 ? `-£${formatted}` : `£${formatted}`;
+
+    if (value < 0) {
+      return `-£${formatted}`;
+    }
+
+    if (includePositiveSign && value > 0) {
+      return `+£${formatted}`;
+    }
+
+    return `£${formatted}`;
   }
 
   formatTime(date: Date | null): string {

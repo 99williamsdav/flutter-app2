@@ -24,7 +24,7 @@
             {{ formatCurrency(data.normalProfit) }}{{ data.normalStale ? ' !' : '' }}
           </ion-col>
           <ion-col size="6" class="metric-value aligned-right" [class.negative]="data.normalCashout !== null && data.normalCashout < 0" [class.positive]="data.normalCashout !== null && data.normalCashout > 0">
-            ({{ formatCurrency(data.normalCashout) }})
+            ({{ formatCurrency(data.normalCashout, true) }})
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -43,7 +43,7 @@
             {{ formatCurrency(data.inplayProfit) }}{{ data.inplayStale ? ' !' : '' }}
           </ion-col>
           <ion-col size="6" class="metric-value aligned-right" [class.negative]="data.inplayExpected !== null && data.inplayExpected < 0" [class.positive]="data.inplayExpected !== null && data.inplayExpected > 0">
-            ({{ formatCurrency(data.inplayExpected) }})
+            ({{ formatCurrency(data.inplayExpected, true) }})
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -62,7 +62,7 @@
             {{ formatCurrency(data.snowballProfit) }}{{ data.snowballStale ? ' !' : '' }}
           </ion-col>
           <ion-col size="6" class="metric-value aligned-right" [class.negative]="data.snowballCashout !== null && data.snowballCashout < 0" [class.positive]="data.snowballCashout !== null && data.snowballCashout > 0">
-            ({{ formatCurrency(data.snowballCashout) }})
+            ({{ formatCurrency(data.snowballCashout, true) }})
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -97,7 +97,7 @@
             {{ formatCurrency(data.openStake) }}
           </ion-col>
           <ion-col size="6" class="metric-value aligned-right">
-            ({{ formatCurrency(data.openAverageProfit) }})
+            ({{ formatCurrency(data.openAverageProfit, true) }})
           </ion-col>
         </ion-row>
       </ion-grid>
