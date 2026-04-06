@@ -39,6 +39,17 @@ const FLUTTERBOT_HEADERS = { Referer: 'https://flutterbot.co.uk/' };
 
 const STALE_THRESHOLD_MS = 30000;
 
+function MetricRow({ label, value, stale }) {
+  return (
+    <View style={styles.row}>
+      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.value, value && value.startsWith('-') ? styles.negative : styles.positive]}>
+        {value}{stale ? ' !' : ''}
+      </Text>
+    </View>
+  );
+}
+
 function formatCurrency(value) {
   if (value === null || value === undefined) return '£--.--';
   const abs = Math.abs(value);
@@ -179,15 +190,6 @@ export default function HomeScreen() {
     normalData?.profit !== null && inplayData?.profit !== null && snowballData?.profit !== null
       ? (normalData?.profit ?? 0) + (inplayData?.profit ?? 0) + (snowballData?.profit ?? 0)
       : null;
-
-  const MetricRow = ({ label, value, stale }) => (
-    <View style={styles.row}>
-      <Text style={styles.label}>{label}</Text>
-      <Text style={[styles.value, value && value.startsWith('-') ? styles.negative : styles.positive]}>
-        {value}{stale ? ' !' : ''}
-      </Text>
-    </View>
-  );
 
   if (loading) {
     return (
