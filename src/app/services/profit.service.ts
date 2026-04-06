@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface StatsData {
   profit: number | null;
@@ -36,9 +37,8 @@ export interface ProfitData {
   providedIn: 'root',
 })
 export class ProfitService {
-  private readonly flutterbotBase = 'https://flutterbot.co.uk/api';
-  private readonly snowballBase = 'https://snowball.flutterbot.co.uk/api';
-  private readonly flutterbotHeaders = new HttpHeaders({ Referer: 'https://flutterbot.co.uk/' });
+  private readonly flutterbotBase = environment.flutterbotApiBase;
+  private readonly snowballBase = environment.snowballApiBase;
 
   constructor(private http: HttpClient) {}
 
@@ -50,13 +50,12 @@ export class ProfitService {
     return `${yyyy}-${mm}-${dd}`;
   }
 
-  private fetchStats(baseUrl: string, extraFilter: string, headers?: HttpHeaders): Observable<StatsData> {
+  private fetchStats(baseUrl: string, extraFilter: string): Observable<StatsData> {
     const date = this.getToday();
     const dsFilters = `{${extraFilter}Void: false}`;
     const url = `${baseUrl}/stats?df=${date}&dt=${date}&groupings=["All"]&dsFilters=${dsFilters}&specialFilters={}`;
-    const options = headers ? { headers } : {};
 
-    return this.http.get<any>(url, options).pipe(
+    return this.http.get<any>(url).pipe(
       map(response => {
         const net = response?.All?.[0]?.Net;
         return {
@@ -72,7 +71,7 @@ export class ProfitService {
 
   private fetchOpenBets(): Observable<number | null> {
     const url = `${this.flutterbotBase}/open`;
-    return this.http.get<OpenBet[]>(url, { headers: this.flutterbotHeaders }).pipe(
+    return this.http.get<OpenBet[]>(url).pipe(
       map(bets => {
         if (!bets || !Array.isArray(bets)) return null;
         return bets.reduce((sum, bet) => {
@@ -85,9 +84,9 @@ export class ProfitService {
 
   fetchAll(): Observable<ProfitData> {
     return forkJoin({
-      normal: this.fetchStats(this.flutterbotBase, '', this.flutterbotHeaders),
+      normal: this.fetchStats(this.flutterbotBase, ''),
       snowball: this.fetchStats(this.snowballBase, ''),
-      inplay: this.fetchStats(this.flutterbotBase, 'InPlay: true, ', this.flutterbotHeaders),
+      inplay: this.fetchStats(this.flutterbotBase, 'InPlay: true, '),
       openStake: this.fetchOpenBets(),
     }).pipe(
       map(({ normal, snowball, inplay, openStake }) => ({
