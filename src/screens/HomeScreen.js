@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -97,7 +97,6 @@ export default function HomeScreen() {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [now, setNow] = useState(Date.now());
 
   const fetchNormal = useCallback(async () => {
     try {
@@ -166,16 +165,11 @@ export default function HomeScreen() {
       fetchOpen();
     }, 30000);
 
-    const clockInterval = setInterval(() => {
-      setNow(Date.now());
-    }, 1000);
-
     return () => {
       clearInterval(statsInterval);
       clearInterval(openInterval);
-      clearInterval(clockInterval);
     };
-  }, []);
+  }, [refreshAll, fetchNormal, fetchInPlay, fetchSnowball, fetchOpen]);
 
   const normalStale = isStale(normalTimestamp);
   const inplayStale = isStale(inplayTimestamp);
