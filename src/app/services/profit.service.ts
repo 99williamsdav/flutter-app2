@@ -30,6 +30,7 @@ export interface ProfitData {
   inplayExpected: number | null;
   inplayStale: boolean;
   openStake: number | null;
+  openAverageProfit: number | null;
   lastUpdated: Date | null;
 }
 
@@ -69,16 +70,24 @@ export class ProfitService {
     );
   }
 
-  private fetchOpenBets(): Observable<number | null> {
+  private fetchOpenBets(): Observable<{ openStake: number | null; openAverageProfit: number | null }> {
     const url = `${this.flutterbotBase}/open`;
     return this.http.get<OpenPosition[]>(url).pipe(
       map(bets => {
-        if (!bets || !Array.isArray(bets)) return null;
-        return bets.reduce((sum, bet) => {
-          return sum + (bet.LongShort === 'Long' ? (bet.LongStake ?? 0) : (bet.ShortStake ?? 0));
-        }, 0);
+        if (!bets || !Array.isArray(bets)) {
+          return { openStake: null, openAverageProfit: null };
+        }
+
+        return bets.reduce(
+          (acc, bet) => {
+            acc.openStake += bet.LongShort === 'Long' ? (bet.LongStake ?? 0) : (bet.ShortStake ?? 0);
+            acc.openAverageProfit += bet.AverageProfit ?? 0;
+            return acc;
+          },
+          { openStake: 0, openAverageProfit: 0 }
+        );
       }),
-      catchError(() => of(null))
+      catchError(() => of({ openStake: null, openAverageProfit: null }))
     );
   }
 
@@ -87,9 +96,9 @@ export class ProfitService {
       normal: this.fetchStats(this.flutterbotBase, ''),
       snowball: this.fetchStats(this.snowballBase, ''),
       inplay: this.fetchStats(this.flutterbotBase, 'InPlay: true, '),
-      openStake: this.fetchOpenBets(),
+      open: this.fetchOpenBets(),
     }).pipe(
-      map(({ normal, snowball, inplay, openStake }) => ({
+      map(({ normal, snowball, inplay, open }) => ({
         normalProfit: normal.profit,
         normalCashout: normal.cashoutValue,
         normalStale: normal.stale,
@@ -99,7 +108,8 @@ export class ProfitService {
         inplayProfit: inplay.profit,
         inplayExpected: inplay.expectedProfit,
         inplayStale: inplay.stale,
-        openStake,
+        openStake: open.openStake,
+        openAverageProfit: open.openAverageProfit,
         lastUpdated: new Date(),
       }))
     );

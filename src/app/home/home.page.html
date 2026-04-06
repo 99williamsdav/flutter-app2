@@ -85,17 +85,19 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- Details -->
+  <!-- Open Stake -->
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Details</ion-card-title>
+      <ion-card-title>Open Stake</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-grid>
         <ion-row>
-          <ion-col size="6" class="metric-label">Open Stake</ion-col>
-          <ion-col size="6" class="metric-value" [class.negative]="data.openStake !== null && data.openStake < 0">
+          <ion-col size="6" class="metric-value aligned-left">
             {{ formatCurrency(data.openStake) }}
+          </ion-col>
+          <ion-col size="6" class="metric-value aligned-right">
+            ({{ formatCurrency(data.openAverageProfit) }})
           </ion-col>
         </ion-row>
       </ion-grid>

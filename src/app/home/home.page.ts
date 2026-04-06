@@ -57,6 +57,7 @@ export class HomePage implements OnInit, OnDestroy {
     inplayExpected: null,
     inplayStale: false,
     openStake: null,
+    openAverageProfit: null,
     lastUpdated: null,
   };
 
