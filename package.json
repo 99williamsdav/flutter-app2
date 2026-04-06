@@ -32,6 +32,7 @@
     "@angular/cli": "^19.2.0",
     "@angular/compiler": "^19.2.20",
     "@angular/compiler-cli": "^19.2.20",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^6.0.0",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.1.0",
