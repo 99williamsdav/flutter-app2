@@ -67,6 +67,21 @@ ion-card {
   color: #ffe4e6;
 }
 
+.gross-subvalue {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.gross-subvalue.positive {
+  color: #dcfce7;
+}
+
+.gross-subvalue.negative {
+  color: #ffe4e6;
+}
+
 .strategy-grid {
   display: grid;
   gap: 14px;

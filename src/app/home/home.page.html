@@ -24,6 +24,9 @@
         <div class="gross-value" [class.negative]="grossTotal !== null && grossTotal < 0" [class.positive]="grossTotal !== null && grossTotal > 0">
           {{ formatCurrency(grossTotal) }}
         </div>
+        <div class="gross-subvalue" [class.negative]="grossWeekToDateTotal !== null && grossWeekToDateTotal < 0" [class.positive]="grossWeekToDateTotal !== null && grossWeekToDateTotal > 0">
+          This week: {{ formatCurrency(grossWeekToDateTotal) }}
+        </div>
       </ion-card-content>
     </ion-card>
 
@@ -89,10 +92,10 @@
           <div class="metric-value main">
             {{ formatCurrency(data.openStake) }}
           </div>
-          <div class="metric-value side open-stake-expected">
+          <div class="metric-value side open-stake-expected" *ngIf="data.openStake !== 0">
             {{ formatCurrency(data.openAverageProfit, true) }}
           </div>
-          <div class="metric-value side open-lay-value" [class.negative]="data.openLayValue !== null && data.openLayValue < 0" [class.positive]="data.openLayValue !== null && data.openLayValue > 0">
+          <div class="metric-value side open-lay-value" *ngIf="data.openStake !== 0" [class.negative]="data.openLayValue !== null && data.openLayValue < 0" [class.positive]="data.openLayValue !== null && data.openLayValue > 0">
             ({{ formatCurrency(data.openLayValue, true) }})
           </div>
         </div>

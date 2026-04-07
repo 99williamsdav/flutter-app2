@@ -48,12 +48,15 @@ import { ProfitService, ProfitData } from '../services/profit.service';
 export class HomePage implements OnInit, OnDestroy {
   data: ProfitData = {
     normalProfit: null,
+    normalWeekToDateProfit: null,
     normalCashout: null,
     normalStale: false,
     snowballProfit: null,
+    snowballWeekToDateProfit: null,
     snowballCashout: null,
     snowballStale: false,
     inplayProfit: null,
+    inplayWeekToDateProfit: null,
     inplayExpected: null,
     inplayStale: false,
     openStake: null,
@@ -120,5 +123,11 @@ export class HomePage implements OnInit, OnDestroy {
     const p = this.data;
     if (p.normalProfit === null && p.snowballProfit === null && p.inplayProfit === null) return null;
     return (p.normalProfit ?? 0) + (p.snowballProfit ?? 0) + (p.inplayProfit ?? 0);
+  }
+
+  get grossWeekToDateTotal(): number | null {
+    const p = this.data;
+    if (p.normalWeekToDateProfit === null && p.snowballWeekToDateProfit === null && p.inplayWeekToDateProfit === null) return null;
+    return (p.normalWeekToDateProfit ?? 0) + (p.snowballWeekToDateProfit ?? 0) + (p.inplayWeekToDateProfit ?? 0);
   }
 }

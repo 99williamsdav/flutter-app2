@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 
 export interface StatsData {
   profit: number | null;
+  weekToDateProfit: number | null;
   cashoutValue: number | null;
   expectedProfit: number | null;
   stale: boolean;
@@ -28,12 +29,15 @@ export interface RaceData {
 
 export interface ProfitData {
   normalProfit: number | null;
+  normalWeekToDateProfit: number | null;
   normalCashout: number | null;
   normalStale: boolean;
   snowballProfit: number | null;
+  snowballWeekToDateProfit: number | null;
   snowballCashout: number | null;
   snowballStale: boolean;
   inplayProfit: number | null;
+  inplayWeekToDateProfit: number | null;
   inplayExpected: number | null;
   inplayStale: boolean;
   openStake: number | null;
@@ -60,6 +64,18 @@ export class ProfitService {
     return `${yyyy}-${mm}-${dd}`;
   }
 
+  private getStartOfWeek(): string {
+    const now = new Date();
+    const mondayBasedDay = (now.getDay() + 6) % 7;
+    const start = new Date(now);
+    start.setDate(now.getDate() - mondayBasedDay);
+
+    const yyyy = start.getFullYear();
+    const mm = String(start.getMonth() + 1).padStart(2, '0');
+    const dd = String(start.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
   private isRaceToday(raceDate: Date | string | null | undefined): boolean {
     if (!raceDate) {
       return false;
@@ -79,22 +95,31 @@ export class ProfitService {
     return `${date.toISOString().slice(0, 16)}Z`;
   }
 
-  private fetchStats(baseUrl: string, extraFilter: string): Observable<StatsData> {
+  private fetchStats(baseUrl: string, extraFilter: string, dateFrom: string, dateTo: string): Observable<StatsData> {
     const date = this.getToday();
+    const weekStart = this.getStartOfWeek();
     const dsFilters = `{${extraFilter}Void: false}`;
-    const url = `${baseUrl}/stats?df=${date}&dt=${date}&groupings=["All"]&dsFilters=${dsFilters}&specialFilters={}`;
+    const url = `${baseUrl}/stats?df=${dateFrom}&dt=${dateTo}&groupings=["All"]&dsFilters=${dsFilters}&specialFilters={}`;
+    const weekToDateUrl = `${baseUrl}/stats?df=${weekStart}&dt=${date}&groupings=["All"]&dsFilters=${dsFilters}&specialFilters={}`;
 
-    return this.http.get<any>(url).pipe(
-      map((response: any) => {
-        const net = response?.All?.[0]?.Net;
+    return forkJoin({
+      day: this.http.get<any>(url),
+      week: this.http.get<any>(weekToDateUrl),
+    }).pipe(
+      map(({ day, week }: { day: any; week: any }) => {
+        const dayNet = day?.All?.[0]?.Net;
+        const weekNet = week?.All?.[0]?.Net;
         return {
-          profit: net?.Profit ?? null,
-          cashoutValue: net?.CashoutValueExclLargeSpread ?? null,
-          expectedProfit: net?.ExpectedProfit ?? null,
+          profit: dayNet?.Profit ?? null,
+          weekToDateProfit: weekNet?.Profit ?? null,
+          cashoutValue: dayNet?.CashoutValueExclLargeSpread ?? null,
+          expectedProfit: dayNet?.ExpectedProfit ?? null,
           stale: false,
         };
       }),
-      catchError(() => of({ profit: null, cashoutValue: null, expectedProfit: null, stale: true }))
+      catchError(() =>
+        of({ profit: null, weekToDateProfit: null, cashoutValue: null, expectedProfit: null, stale: true })
+      )
     );
   }
 
@@ -145,21 +170,25 @@ export class ProfitService {
 
 
   fetchAll(): Observable<ProfitData> {
+    const today = this.getToday();
     return forkJoin({
-      normal: this.fetchStats(this.flutterbotBase, ''),
-      snowball: this.fetchStats(this.snowballBase, ''),
-      inplay: this.fetchStats(this.flutterbotBase, 'InPlay: true, '),
+      normal: this.fetchStats(this.flutterbotBase, '', today, today),
+      snowball: this.fetchStats(this.snowballBase, '', today, today),
+      inplay: this.fetchStats(this.flutterbotBase, 'InPlay: true, ', today, today),
       open: this.fetchOpenBets(),
       upcomingRaces: this.fetchUpcomingRaces(),
     }).pipe(
       map(({ normal, snowball, inplay, open, upcomingRaces }) => ({
         normalProfit: normal.profit,
+        normalWeekToDateProfit: normal.weekToDateProfit,
         normalCashout: normal.cashoutValue,
         normalStale: normal.stale,
         snowballProfit: snowball.profit,
+        snowballWeekToDateProfit: snowball.weekToDateProfit,
         snowballCashout: snowball.cashoutValue,
         snowballStale: snowball.stale,
         inplayProfit: inplay.profit,
+        inplayWeekToDateProfit: inplay.weekToDateProfit,
         inplayExpected: inplay.expectedProfit,
         inplayStale: inplay.stale,
         openStake: open.openStake,
