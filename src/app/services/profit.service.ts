@@ -38,6 +38,7 @@ export interface ProfitData {
   inplayStale: boolean;
   openStake: number | null;
   openAverageProfit: number | null;
+  upcomingGBRaces: number;
   lastUpdated: Date | null;
 }
 
@@ -115,14 +116,40 @@ export class ProfitService {
     );
   }
 
+  private fetchUpcomingRaces(): Observable<number> {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mins = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    const dateFromString = `${yyyy}-${mm}-${dd}T${hh}:${mins}:${ss}`;
+    const dateToString = `${yyyy}-${mm}-${dd}T23:59:59`;
+
+    const url = `${this.flutterbotBase}/races?df=${encodeURIComponent(dateFromString)}&dt=${encodeURIComponent(dateToString)}`;
+
+    return this.http.get<RaceData[]>(url).pipe(
+      map(races => {
+        if (!races || !Array.isArray(races)) {
+          return 0;
+        }
+        return races.filter(race => race.Country === 'GB').length;
+      }),
+      catchError(() => of(0))
+    );
+  }
+
+
   fetchAll(): Observable<ProfitData> {
     return forkJoin({
       normal: this.fetchStats(this.flutterbotBase, ''),
       snowball: this.fetchStats(this.snowballBase, ''),
       inplay: this.fetchStats(this.flutterbotBase, 'InPlay: true, '),
       open: this.fetchOpenBets(),
+      upcomingRaces: this.fetchUpcomingRaces(),
     }).pipe(
-      map(({ normal, snowball, inplay, open }) => ({
+      map(({ normal, snowball, inplay, open, upcomingRaces }) => ({
         normalProfit: normal.profit,
         normalCashout: normal.cashoutValue,
         normalStale: normal.stale,
@@ -134,6 +161,7 @@ export class ProfitService {
         inplayStale: inplay.stale,
         openStake: open.openStake,
         openAverageProfit: open.openAverageProfit,
+        upcomingGBRaces: upcomingRaces,
         lastUpdated: new Date(),
       }))
     );
