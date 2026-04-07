@@ -11,6 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      HAS_ANDROID_SIGNING: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
 
     steps:
       - name: Checkout repository
@@ -37,6 +43,29 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
+      - name: Configure Android signing from secrets
+        if: env.HAS_ANDROID_SIGNING == 'true'
+        run: |
+          mkdir -p android/keys
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/keys/release-keystore.jks
+          cat > android/keystore.properties <<EOF
+          storeFile=../keys/release-keystore.jks
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
+          EOF
+
+      - name: Set Android version metadata
+        run: |
+          echo "ANDROID_VERSION_CODE=${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+          BASE_VERSION=$(node -p "require('./package.json').version")
+          echo "ANDROID_VERSION_NAME=${BASE_VERSION}+${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+
+      - name: Show Android version metadata
+        run: |
+          echo "VERSION_CODE=$ANDROID_VERSION_CODE"
+          echo "VERSION_NAME=$ANDROID_VERSION_NAME"
+
       - name: Generate Android assets
         run: npx @capacitor/assets generate --android --assetPath resources
 
@@ -49,12 +78,28 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
+      - name: Build signed release APK
+        if: env.HAS_ANDROID_SIGNING == 'true'
+        run: |
+          cd android
+          ./gradlew assembleRelease --no-daemon
+
       - name: Build debug APK
+        if: env.HAS_ANDROID_SIGNING != 'true'
         run: |
           cd android
           ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK artifact
+      - name: Upload signed release APK artifact
+        if: env.HAS_ANDROID_SIGNING == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutterbot-profit-tracker-release
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+
+      - name: Upload debug APK artifact
+        if: env.HAS_ANDROID_SIGNING != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: flutterbot-profit-tracker-debug
