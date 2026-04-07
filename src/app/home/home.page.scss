@@ -133,6 +133,21 @@ ion-card-title {
   margin-bottom: 8px;
 }
 
+.open-stake-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.open-stake-expected {
+  justify-self: center;
+}
+
+.open-lay-value {
+  justify-self: end;
+}
+
 .footnote {
   font-size: 0.78rem;
   text-align: center;

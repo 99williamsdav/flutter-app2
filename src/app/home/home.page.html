@@ -85,16 +85,19 @@
         <ion-card-title>Open Stake</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        <div class="metric-row">
+        <div class="metric-row open-stake-row">
           <div class="metric-value main">
             {{ formatCurrency(data.openStake) }}
           </div>
-          <div class="metric-value side" *ngIf="data.openStake !== 0">
-            ({{ formatCurrency(data.openAverageProfit, true) }})
+          <div class="metric-value side open-stake-expected">
+            {{ formatCurrency(data.openAverageProfit, true) }}
+          </div>
+          <div class="metric-value side open-lay-value" [class.negative]="data.openLayValue !== null && data.openLayValue < 0" [class.positive]="data.openLayValue !== null && data.openLayValue > 0">
+            ({{ formatCurrency(data.openLayValue, true) }})
           </div>
         </div>
         <div class="upcoming-races-label">
-          {{ data.upcomingGBRaces }} upcoming GB races
+          {{ data.upcomingGBRaces }} upcoming GB race{{ data.upcomingGBRaces === 1 ? '' : 's' }}
         </div>
       </ion-card-content>
     </ion-card>

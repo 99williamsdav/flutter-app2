@@ -38,6 +38,7 @@ export interface ProfitData {
   inplayStale: boolean;
   openStake: number | null;
   openAverageProfit: number | null;
+  openLayValue: number | null;
   upcomingGBRaces: number;
   lastUpdated: Date | null;
 }
@@ -80,7 +81,7 @@ export class ProfitService {
     const url = `${baseUrl}/stats?df=${date}&dt=${date}&groupings=["All"]&dsFilters=${dsFilters}&specialFilters={}`;
 
     return this.http.get<any>(url).pipe(
-      map(response => {
+      map((response: any) => {
         const net = response?.All?.[0]?.Net;
         return {
           profit: net?.Profit ?? null,
@@ -93,12 +94,12 @@ export class ProfitService {
     );
   }
 
-  private fetchOpenBets(): Observable<{ openStake: number | null; openAverageProfit: number | null }> {
+  private fetchOpenBets(): Observable<{ openStake: number | null; openAverageProfit: number | null; openLayValue: number | null }> {
     const url = `${this.flutterbotBase}/open`;
     return this.http.get<OpenPosition[]>(url).pipe(
       map(bets => {
         if (!bets || !Array.isArray(bets)) {
-          return { openStake: null, openAverageProfit: null };
+          return { openStake: null, openAverageProfit: null, openLayValue: null };
         }
 
         const todaysBets = bets.filter(bet => this.isRaceToday(bet.Race?.Date));
@@ -107,12 +108,13 @@ export class ProfitService {
           (acc, bet) => {
             acc.openStake += bet.LongShort === 'Long' ? (bet.LongStake ?? 0) : (bet.ShortStake ?? 0);
             acc.openAverageProfit += bet.AverageProfit ?? 0;
+            acc.openLayValue += bet.LayValue ?? 0;
             return acc;
           },
-          { openStake: 0, openAverageProfit: 0 }
+          { openStake: 0, openAverageProfit: 0, openLayValue: 0 }
         );
       }),
-      catchError(() => of({ openStake: null, openAverageProfit: null }))
+      catchError(() => of({ openStake: null, openAverageProfit: null, openLayValue: null }))
     );
   }
 
@@ -161,6 +163,7 @@ export class ProfitService {
         inplayStale: inplay.stale,
         openStake: open.openStake,
         openAverageProfit: open.openAverageProfit,
+        openLayValue: open.openLayValue,
         upcomingGBRaces: upcomingRaces,
         lastUpdated: new Date(),
       }))
