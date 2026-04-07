@@ -75,6 +75,10 @@ export class ProfitService {
     return `${yyyy}-${mm}-${dd}` === this.getToday();
   }
 
+  private formatUtcQueryParam(date: Date): string {
+    return `${date.toISOString().slice(0, 16)}Z`;
+  }
+
   private fetchStats(baseUrl: string, extraFilter: string): Observable<StatsData> {
     const date = this.getToday();
     const dsFilters = `{${extraFilter}Void: false}`;
@@ -120,14 +124,11 @@ export class ProfitService {
 
   private fetchUpcomingRaces(): Observable<number> {
     const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const dd = String(now.getDate()).padStart(2, '0');
-    const hh = String(now.getHours()).padStart(2, '0');
-    const mins = String(now.getMinutes()).padStart(2, '0');
-    const ss = String(now.getSeconds()).padStart(2, '0');
-    const dateFromString = `${yyyy}-${mm}-${dd}T${hh}:${mins}:${ss}`;
-    const dateToString = `${yyyy}-${mm}-${dd}T23:59:59`;
+    const endOfLocalDay = new Date(now);
+    endOfLocalDay.setHours(24, 0, 0, 0);
+
+    const dateFromString = this.formatUtcQueryParam(now);
+    const dateToString = this.formatUtcQueryParam(endOfLocalDay);
 
     const url = `${this.flutterbotBase}/races?df=${encodeURIComponent(dateFromString)}&dt=${encodeURIComponent(dateToString)}`;
 

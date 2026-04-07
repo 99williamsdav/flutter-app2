@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.flutterbot.profittracker',
-  appName: 'FlutterBot Profit Tracker',
+  appName: 'Flutterbot Profit Tracker',
   webDir: 'www',
   server: {
     androidScheme: 'https'
