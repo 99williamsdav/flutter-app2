@@ -25,6 +25,7 @@ export interface RaceData {
   Date: Date | string;
   Venue: string;
   Country: string;
+  Commission: number | null;
 }
 
 export interface ProfitData {
@@ -43,6 +44,7 @@ export interface ProfitData {
   openStake: number | null;
   openAverageProfit: number | null;
   openLayValue: number | null;
+  commissionPaidToday: number | null;
   upcomingGBRaces: number;
   lastUpdated: Date | null;
 }
@@ -168,6 +170,42 @@ export class ProfitService {
     );
   }
 
+  private fetchCommissionPaidTodayForBase(baseUrl: string): Observable<number | null> {
+    const now = new Date();
+    const startOfLocalDay = new Date(now);
+    startOfLocalDay.setHours(0, 0, 0, 0);
+
+    const dateFromString = this.formatUtcQueryParam(startOfLocalDay);
+    const dateToString = this.formatUtcQueryParam(now);
+
+    const url = `${baseUrl}/races?df=${encodeURIComponent(dateFromString)}&dt=${encodeURIComponent(dateToString)}`;
+
+    return this.http.get<RaceData[]>(url).pipe(
+      map(races => {
+        if (!races || !Array.isArray(races)) {
+          return 0;
+        }
+
+        return races.reduce((total, race) => total + (race.Commission ?? 0), 0);
+      }),
+      catchError(() => of(null))
+    );
+  }
+
+  private fetchCommissionPaidToday(): Observable<number | null> {
+    return forkJoin({
+      flutterbot: this.fetchCommissionPaidTodayForBase(this.flutterbotBase),
+      snowball: this.fetchCommissionPaidTodayForBase(this.snowballBase),
+    }).pipe(
+      map(({ flutterbot, snowball }) => {
+        if (flutterbot === null && snowball === null) {
+          return null;
+        }
+        return (flutterbot ?? 0) + (snowball ?? 0);
+      })
+    );
+  }
+
 
   fetchAll(): Observable<ProfitData> {
     const today = this.getToday();
@@ -176,9 +214,10 @@ export class ProfitService {
       snowball: this.fetchStats(this.snowballBase, '', today, today),
       inplay: this.fetchStats(this.flutterbotBase, 'InPlay: true, ', today, today),
       open: this.fetchOpenBets(),
+      commissionPaidToday: this.fetchCommissionPaidToday(),
       upcomingRaces: this.fetchUpcomingRaces(),
     }).pipe(
-      map(({ normal, snowball, inplay, open, upcomingRaces }) => ({
+      map(({ normal, snowball, inplay, open, commissionPaidToday, upcomingRaces }) => ({
         normalProfit: normal.profit,
         normalWeekToDateProfit: normal.weekToDateProfit,
         normalCashout: normal.cashoutValue,
@@ -194,6 +233,7 @@ export class ProfitService {
         openStake: open.openStake,
         openAverageProfit: open.openAverageProfit,
         openLayValue: open.openLayValue,
+        commissionPaidToday,
         upcomingGBRaces: upcomingRaces,
         lastUpdated: new Date(),
       }))

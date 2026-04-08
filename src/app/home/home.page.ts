@@ -62,6 +62,7 @@ export class HomePage implements OnInit, OnDestroy {
     openStake: null,
     openAverageProfit: null,
     openLayValue: null,
+    commissionPaidToday: null,
     upcomingGBRaces: 0,
     lastUpdated: null,
   };

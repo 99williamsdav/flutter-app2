@@ -27,6 +27,9 @@
         <div class="gross-subvalue" [class.negative]="grossWeekToDateTotal !== null && grossWeekToDateTotal < 0" [class.positive]="grossWeekToDateTotal !== null && grossWeekToDateTotal > 0">
           This week: {{ formatCurrency(grossWeekToDateTotal) }}
         </div>
+        <div class="gross-subvalue">
+          Commission: {{ formatCurrency(data.commissionPaidToday) }}
+        </div>
       </ion-card-content>
     </ion-card>
 
