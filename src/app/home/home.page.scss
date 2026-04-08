@@ -44,44 +44,6 @@ ion-card {
   }
 }
 
-.section-label {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 8px;
-}
-
-.gross-value {
-  font-size: clamp(2rem, 6vw, 2.9rem);
-  font-weight: 800;
-  line-height: 1;
-  color: #f9fafb;
-}
-
-.gross-value.positive {
-  color: #dcfce7;
-}
-
-.gross-value.negative {
-  color: #ffe4e6;
-}
-
-.gross-subvalue {
-  margin-top: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.gross-subvalue.positive {
-  color: #dcfce7;
-}
-
-.gross-subvalue.negative {
-  color: #ffe4e6;
-}
-
 .strategy-grid {
   display: grid;
   gap: 14px;
@@ -92,43 +54,6 @@ ion-card {
 .strategy-card ion-card-header,
 .open-stake-card ion-card-header {
   padding-bottom: 6px;
-}
-
-ion-card-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--text-title);
-  letter-spacing: 0.02em;
-}
-
-.metric-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.metric-value {
-  font-weight: 700;
-  color: var(--text-title);
-}
-
-.metric-value.main {
-  font-size: clamp(1.3rem, 4.5vw, 1.8rem);
-}
-
-.metric-value.side {
-  font-size: clamp(0.9rem, 3vw, 1.05rem);
-  color: var(--text-muted);
-  padding-bottom: 3px;
-}
-
-.metric-value.positive {
-  color: var(--positive);
-}
-
-.metric-value.negative {
-  color: var(--negative);
 }
 
 .stale-indicator {

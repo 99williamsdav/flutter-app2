@@ -13,9 +13,6 @@ import {
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
-  IonGrid,
-  IonRow,
-  IonCol,
   IonRefresher,
   IonRefresherContent,
 } from '@ionic/angular/standalone';
@@ -38,31 +35,35 @@ import { ProfitService, ProfitData } from '../services/profit.service';
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
-    IonGrid,
-    IonRow,
-    IonCol,
     IonRefresher,
     IonRefresherContent,
   ],
 })
 export class HomePage implements OnInit, OnDestroy {
+  activeView: 'today' | 'week' = 'today';
+  private touchStartX: number | null = null;
+
   data: ProfitData = {
     normalProfit: null,
     normalWeekToDateProfit: null,
     normalCashout: null,
+    normalWeekToDateCashout: null,
     normalStale: false,
     snowballProfit: null,
     snowballWeekToDateProfit: null,
     snowballCashout: null,
+    snowballWeekToDateCashout: null,
     snowballStale: false,
     inplayProfit: null,
     inplayWeekToDateProfit: null,
     inplayExpected: null,
+    inplayWeekToDateExpected: null,
     inplayStale: false,
     openStake: null,
     openAverageProfit: null,
     openLayValue: null,
     commissionPaidToday: null,
+    commissionPaidThisWeek: null,
     upcomingGBRaces: 0,
     lastUpdated: null,
   };
@@ -95,6 +96,28 @@ export class HomePage implements OnInit, OnDestroy {
       this.data = result;
       event.target.complete();
     });
+  }
+
+  handleTouchStart(event: TouchEvent) {
+    this.touchStartX = event.changedTouches[0]?.clientX ?? null;
+  }
+
+  handleTouchEnd(event: TouchEvent) {
+    const touchEndX = event.changedTouches[0]?.clientX;
+    if (this.touchStartX === null || touchEndX === undefined) {
+      return;
+    }
+
+    const swipeDelta = touchEndX - this.touchStartX;
+    const minSwipeDistance = 45;
+
+    if (Math.abs(swipeDelta) < minSwipeDistance) {
+      this.touchStartX = null;
+      return;
+    }
+
+    this.activeView = swipeDelta < 0 ? 'week' : 'today';
+    this.touchStartX = null;
   }
 
   formatCurrency(value: number | null, includePositiveSign = false): string {

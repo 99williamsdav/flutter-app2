@@ -13,100 +13,175 @@
   </ion-refresher>
 
   <div class="home-shell ion-padding">
-    <ion-card
-      class="hero-card"
-      [class.gross-positive]="grossTotal !== null && grossTotal > 0"
-      [class.gross-negative]="grossTotal !== null && grossTotal < 0"
-      [class.gross-neutral]="grossTotal === 0 || grossTotal === null"
-    >
-      <ion-card-content>
-        <div class="section-label">Gross</div>
-        <div class="gross-value" [class.negative]="grossTotal !== null && grossTotal < 0" [class.positive]="grossTotal !== null && grossTotal > 0">
-          {{ formatCurrency(grossTotal) }}
-        </div>
-        <div class="gross-subvalue" [class.negative]="grossWeekToDateTotal !== null && grossWeekToDateTotal < 0" [class.positive]="grossWeekToDateTotal !== null && grossWeekToDateTotal > 0">
-          This week: {{ formatCurrency(grossWeekToDateTotal) }}
-        </div>
-        <div class="gross-subvalue">
-          Commission: {{ formatCurrency(data.commissionPaidToday) }}
-        </div>
-      </ion-card-content>
-    </ion-card>
+    <div class="swipe-viewport" (touchstart)="handleTouchStart($event)" (touchend)="handleTouchEnd($event)">
+      <div class="swipe-track" [class.week-active]="activeView === 'week'">
+        <section class="swipe-panel">
+          <ion-card
+            class="hero-card"
+            [class.gross-positive]="grossTotal !== null && grossTotal > 0"
+            [class.gross-negative]="grossTotal !== null && grossTotal < 0"
+            [class.gross-neutral]="grossTotal === 0 || grossTotal === null"
+          >
+            <ion-card-content>
+              <div class="section-label">Today's Profit</div>
+              <div class="gross-value" [class.negative]="grossTotal !== null && grossTotal < 0" [class.positive]="grossTotal !== null && grossTotal > 0">
+                {{ formatCurrency(grossTotal) }}
+              </div>
+              <div class="gross-subvalue">
+                Commission: {{ formatCurrency(data.commissionPaidToday) }}
+              </div>
+            </ion-card-content>
+          </ion-card>
 
-    <div class="strategy-grid">
-      <ion-card class="strategy-card">
-        <ion-card-header>
-          <ion-card-title>Normal</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <div class="metric-row">
-            <div class="metric-value main" [class.negative]="data.normalProfit !== null && data.normalProfit < 0" [class.positive]="data.normalProfit !== null && data.normalProfit > 0">
-              {{ formatCurrency(data.normalProfit) }}
-            </div>
-            <div class="metric-value side" [class.negative]="data.normalCashout !== null && data.normalCashout < 0" [class.positive]="data.normalCashout !== null && data.normalCashout > 0">
-              ({{ formatCurrency(data.normalCashout, true) }})
-            </div>
-          </div>
-          <div class="stale-indicator" *ngIf="data.normalStale">Data stale !</div>
-        </ion-card-content>
-      </ion-card>
+          <div class="strategy-grid">
+            <ion-card class="strategy-card">
+              <ion-card-header>
+                <ion-card-title>Normal</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <div class="metric-row">
+                  <div class="metric-value main" [class.negative]="data.normalProfit !== null && data.normalProfit < 0" [class.positive]="data.normalProfit !== null && data.normalProfit > 0">
+                    {{ formatCurrency(data.normalProfit) }}
+                  </div>
+                  <div class="metric-value side" [class.negative]="data.normalCashout !== null && data.normalCashout < 0" [class.positive]="data.normalCashout !== null && data.normalCashout > 0">
+                    ({{ formatCurrency(data.normalCashout, true) }})
+                  </div>
+                </div>
+                <div class="stale-indicator" *ngIf="data.normalStale">Data stale !</div>
+              </ion-card-content>
+            </ion-card>
 
-      <ion-card class="strategy-card">
-        <ion-card-header>
-          <ion-card-title>InPlay</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <div class="metric-row">
-            <div class="metric-value main" [class.negative]="data.inplayProfit !== null && data.inplayProfit < 0" [class.positive]="data.inplayProfit !== null && data.inplayProfit > 0">
-              {{ formatCurrency(data.inplayProfit) }}
-            </div>
-            <div class="metric-value side" [class.negative]="data.inplayExpected !== null && data.inplayExpected < 0" [class.positive]="data.inplayExpected !== null && data.inplayExpected > 0">
-              ({{ formatCurrency(data.inplayExpected, true) }})
-            </div>
-          </div>
-          <div class="stale-indicator" *ngIf="data.inplayStale">Data stale !</div>
-        </ion-card-content>
-      </ion-card>
+            <ion-card class="strategy-card">
+              <ion-card-header>
+                <ion-card-title>InPlay</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <div class="metric-row">
+                  <div class="metric-value main" [class.negative]="data.inplayProfit !== null && data.inplayProfit < 0" [class.positive]="data.inplayProfit !== null && data.inplayProfit > 0">
+                    {{ formatCurrency(data.inplayProfit) }}
+                  </div>
+                  <div class="metric-value side" [class.negative]="data.inplayExpected !== null && data.inplayExpected < 0" [class.positive]="data.inplayExpected !== null && data.inplayExpected > 0">
+                    ({{ formatCurrency(data.inplayExpected, true) }})
+                  </div>
+                </div>
+                <div class="stale-indicator" *ngIf="data.inplayStale">Data stale !</div>
+              </ion-card-content>
+            </ion-card>
 
-      <ion-card class="strategy-card">
-        <ion-card-header>
-          <ion-card-title>Snowball</ion-card-title>
-        </ion-card-header>
-        <ion-card-content>
-          <div class="metric-row">
-            <div class="metric-value main" [class.negative]="data.snowballProfit !== null && data.snowballProfit < 0" [class.positive]="data.snowballProfit !== null && data.snowballProfit > 0">
-              {{ formatCurrency(data.snowballProfit) }}
-            </div>
-            <div class="metric-value side" [class.negative]="data.snowballCashout !== null && data.snowballCashout < 0" [class.positive]="data.snowballCashout !== null && data.snowballCashout > 0">
-              ({{ formatCurrency(data.snowballCashout, true) }})
-            </div>
+            <ion-card class="strategy-card">
+              <ion-card-header>
+                <ion-card-title>Snowball</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <div class="metric-row">
+                  <div class="metric-value main" [class.negative]="data.snowballProfit !== null && data.snowballProfit < 0" [class.positive]="data.snowballProfit !== null && data.snowballProfit > 0">
+                    {{ formatCurrency(data.snowballProfit) }}
+                  </div>
+                  <div class="metric-value side" [class.negative]="data.snowballCashout !== null && data.snowballCashout < 0" [class.positive]="data.snowballCashout !== null && data.snowballCashout > 0">
+                    ({{ formatCurrency(data.snowballCashout, true) }})
+                  </div>
+                </div>
+                <div class="stale-indicator" *ngIf="data.snowballStale">Data stale !</div>
+              </ion-card-content>
+            </ion-card>
           </div>
-          <div class="stale-indicator" *ngIf="data.snowballStale">Data stale !</div>
-        </ion-card-content>
-      </ion-card>
+
+          <ion-card class="open-stake-card">
+            <ion-card-header>
+              <ion-card-title>Open Stake</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <div class="metric-row open-stake-row">
+                <div class="metric-value main">
+                  {{ formatCurrency(data.openStake) }}
+                </div>
+                <div class="metric-value side open-stake-expected" *ngIf="data.openStake !== 0">
+                  {{ formatCurrency(data.openAverageProfit, true) }}
+                </div>
+                <div class="metric-value side open-lay-value" *ngIf="data.openStake !== 0" [class.negative]="data.openLayValue !== null && data.openLayValue < 0" [class.positive]="data.openLayValue !== null && data.openLayValue > 0">
+                  ({{ formatCurrency(data.openLayValue, true) }})
+                </div>
+              </div>
+              <div class="upcoming-races-label">
+                {{ data.upcomingGBRaces }} upcoming GB race{{ data.upcomingGBRaces === 1 ? '' : 's' }}
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </section>
+
+        <section class="swipe-panel">
+          <ion-card
+            class="hero-card"
+            [class.gross-positive]="grossWeekToDateTotal !== null && grossWeekToDateTotal > 0"
+            [class.gross-negative]="grossWeekToDateTotal !== null && grossWeekToDateTotal < 0"
+            [class.gross-neutral]="grossWeekToDateTotal === 0 || grossWeekToDateTotal === null"
+          >
+            <ion-card-content>
+              <div class="section-label">This Week's Profit</div>
+              <div class="gross-value" [class.negative]="grossWeekToDateTotal !== null && grossWeekToDateTotal < 0" [class.positive]="grossWeekToDateTotal !== null && grossWeekToDateTotal > 0">
+                {{ formatCurrency(grossWeekToDateTotal) }}
+              </div>
+              <div class="gross-subvalue">
+                Commission: {{ formatCurrency(data.commissionPaidThisWeek) }}
+              </div>
+            </ion-card-content>
+          </ion-card>
+
+          <div class="strategy-grid">
+            <ion-card class="strategy-card">
+              <ion-card-header>
+                <ion-card-title>Normal</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <div class="metric-row">
+                  <div class="metric-value main" [class.negative]="data.normalWeekToDateProfit !== null && data.normalWeekToDateProfit < 0" [class.positive]="data.normalWeekToDateProfit !== null && data.normalWeekToDateProfit > 0">
+                    {{ formatCurrency(data.normalWeekToDateProfit) }}
+                  </div>
+                  <div class="metric-value side" [class.negative]="data.normalWeekToDateCashout !== null && data.normalWeekToDateCashout < 0" [class.positive]="data.normalWeekToDateCashout !== null && data.normalWeekToDateCashout > 0">
+                    ({{ formatCurrency(data.normalWeekToDateCashout, true) }})
+                  </div>
+                </div>
+                <div class="stale-indicator" *ngIf="data.normalStale">Data stale !</div>
+              </ion-card-content>
+            </ion-card>
+
+            <ion-card class="strategy-card">
+              <ion-card-header>
+                <ion-card-title>InPlay</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <div class="metric-row">
+                  <div class="metric-value main" [class.negative]="data.inplayWeekToDateProfit !== null && data.inplayWeekToDateProfit < 0" [class.positive]="data.inplayWeekToDateProfit !== null && data.inplayWeekToDateProfit > 0">
+                    {{ formatCurrency(data.inplayWeekToDateProfit) }}
+                  </div>
+                  <div class="metric-value side" [class.negative]="data.inplayWeekToDateExpected !== null && data.inplayWeekToDateExpected < 0" [class.positive]="data.inplayWeekToDateExpected !== null && data.inplayWeekToDateExpected > 0">
+                    ({{ formatCurrency(data.inplayWeekToDateExpected, true) }})
+                  </div>
+                </div>
+                <div class="stale-indicator" *ngIf="data.inplayStale">Data stale !</div>
+              </ion-card-content>
+            </ion-card>
+
+            <ion-card class="strategy-card">
+              <ion-card-header>
+                <ion-card-title>Snowball</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <div class="metric-row">
+                  <div class="metric-value main" [class.negative]="data.snowballWeekToDateProfit !== null && data.snowballWeekToDateProfit < 0" [class.positive]="data.snowballWeekToDateProfit !== null && data.snowballWeekToDateProfit > 0">
+                    {{ formatCurrency(data.snowballWeekToDateProfit) }}
+                  </div>
+                  <div class="metric-value side" [class.negative]="data.snowballWeekToDateCashout !== null && data.snowballWeekToDateCashout < 0" [class.positive]="data.snowballWeekToDateCashout !== null && data.snowballWeekToDateCashout > 0">
+                    ({{ formatCurrency(data.snowballWeekToDateCashout, true) }})
+                  </div>
+                </div>
+                <div class="stale-indicator" *ngIf="data.snowballStale">Data stale !</div>
+              </ion-card-content>
+            </ion-card>
+          </div>
+        </section>
+      </div>
     </div>
-
-    <ion-card class="open-stake-card">
-      <ion-card-header>
-        <ion-card-title>Open Stake</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
-        <div class="metric-row open-stake-row">
-          <div class="metric-value main">
-            {{ formatCurrency(data.openStake) }}
-          </div>
-          <div class="metric-value side open-stake-expected" *ngIf="data.openStake !== 0">
-            {{ formatCurrency(data.openAverageProfit, true) }}
-          </div>
-          <div class="metric-value side open-lay-value" *ngIf="data.openStake !== 0" [class.negative]="data.openLayValue !== null && data.openLayValue < 0" [class.positive]="data.openLayValue !== null && data.openLayValue > 0">
-            ({{ formatCurrency(data.openLayValue, true) }})
-          </div>
-        </div>
-        <div class="upcoming-races-label">
-          {{ data.upcomingGBRaces }} upcoming GB race{{ data.upcomingGBRaces === 1 ? '' : 's' }}
-        </div>
-      </ion-card-content>
-    </ion-card>
 
     <div class="footnote">
       Last updated: {{ formatTime(data.lastUpdated) }}

@@ -13,3 +13,114 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+app-home ion-segment {
+	margin-bottom: 14px;
+	--background: rgba(255, 255, 255, 0.7);
+	--indicator-color: #1d4ed8;
+	border: 1px solid rgba(71, 84, 103, 0.12);
+	border-radius: 14px;
+	backdrop-filter: blur(4px);
+}
+
+app-home ion-segment-button {
+	min-height: 42px;
+	font-weight: 700;
+	--color: #667085;
+	--color-checked: #ffffff;
+}
+
+app-home .swipe-viewport {
+	overflow: hidden;
+	touch-action: pan-y;
+}
+
+app-home .swipe-track {
+	display: flex;
+	width: 200%;
+	transform: translateX(0%);
+	transition: transform 220ms ease;
+}
+
+app-home .swipe-track.week-active {
+	transform: translateX(-50%);
+}
+
+app-home .swipe-panel {
+	width: 50%;
+}
+
+app-home .section-label {
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	color: rgba(255, 255, 255, 0.7);
+	margin-bottom: 8px;
+}
+
+app-home .gross-value {
+	font-size: clamp(2rem, 6vw, 2.9rem);
+	font-weight: 800;
+	line-height: 1;
+	color: #f9fafb;
+}
+
+app-home .gross-value.positive {
+	color: #dcfce7;
+}
+
+app-home .gross-value.negative {
+	color: #ffe4e6;
+}
+
+app-home .gross-subvalue {
+	margin-top: 8px;
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: rgba(255, 255, 255, 0.85);
+}
+
+app-home .gross-subvalue.positive {
+	color: #dcfce7;
+}
+
+app-home .gross-subvalue.negative {
+	color: #ffe4e6;
+}
+
+app-home ion-card-title {
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: #243042;
+	letter-spacing: 0.02em;
+}
+
+app-home .metric-row {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+app-home .metric-value {
+	font-weight: 700;
+	color: #243042;
+}
+
+app-home .metric-value.main {
+	font-size: clamp(1.3rem, 4.5vw, 1.8rem);
+}
+
+app-home .metric-value.side {
+	font-size: clamp(0.9rem, 3vw, 1.05rem);
+	color: #667085;
+	padding-bottom: 3px;
+}
+
+app-home .metric-value.positive {
+	color: #15803d;
+}
+
+app-home .metric-value.negative {
+	color: #be123c;
+}

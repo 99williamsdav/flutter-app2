@@ -8,7 +8,9 @@ export interface StatsData {
   profit: number | null;
   weekToDateProfit: number | null;
   cashoutValue: number | null;
+  weekToDateCashoutValue: number | null;
   expectedProfit: number | null;
+  weekToDateExpectedProfit: number | null;
   stale: boolean;
 }
 
@@ -32,19 +34,23 @@ export interface ProfitData {
   normalProfit: number | null;
   normalWeekToDateProfit: number | null;
   normalCashout: number | null;
+  normalWeekToDateCashout: number | null;
   normalStale: boolean;
   snowballProfit: number | null;
   snowballWeekToDateProfit: number | null;
   snowballCashout: number | null;
+  snowballWeekToDateCashout: number | null;
   snowballStale: boolean;
   inplayProfit: number | null;
   inplayWeekToDateProfit: number | null;
   inplayExpected: number | null;
+  inplayWeekToDateExpected: number | null;
   inplayStale: boolean;
   openStake: number | null;
   openAverageProfit: number | null;
   openLayValue: number | null;
   commissionPaidToday: number | null;
+  commissionPaidThisWeek: number | null;
   upcomingGBRaces: number;
   lastUpdated: Date | null;
 }
@@ -115,12 +121,22 @@ export class ProfitService {
           profit: dayNet?.Profit ?? null,
           weekToDateProfit: weekNet?.Profit ?? null,
           cashoutValue: dayNet?.CashoutValueExclLargeSpread ?? null,
+          weekToDateCashoutValue: weekNet?.CashoutValueExclLargeSpread ?? null,
           expectedProfit: dayNet?.ExpectedProfit ?? null,
+          weekToDateExpectedProfit: weekNet?.ExpectedProfit ?? null,
           stale: false,
         };
       }),
       catchError(() =>
-        of({ profit: null, weekToDateProfit: null, cashoutValue: null, expectedProfit: null, stale: true })
+        of({
+          profit: null,
+          weekToDateProfit: null,
+          cashoutValue: null,
+          weekToDateCashoutValue: null,
+          expectedProfit: null,
+          weekToDateExpectedProfit: null,
+          stale: true,
+        })
       )
     );
   }
@@ -192,10 +208,48 @@ export class ProfitService {
     );
   }
 
+  private fetchCommissionPaidThisWeekForBase(baseUrl: string): Observable<number | null> {
+    const now = new Date();
+    const mondayBasedDay = (now.getDay() + 6) % 7;
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - mondayBasedDay);
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const dateFromString = this.formatUtcQueryParam(startOfWeek);
+    const dateToString = this.formatUtcQueryParam(now);
+
+    const url = `${baseUrl}/races?df=${encodeURIComponent(dateFromString)}&dt=${encodeURIComponent(dateToString)}`;
+
+    return this.http.get<RaceData[]>(url).pipe(
+      map(races => {
+        if (!races || !Array.isArray(races)) {
+          return 0;
+        }
+
+        return races.reduce((total, race) => total + (race.Commission ?? 0), 0);
+      }),
+      catchError(() => of(null))
+    );
+  }
+
   private fetchCommissionPaidToday(): Observable<number | null> {
     return forkJoin({
       flutterbot: this.fetchCommissionPaidTodayForBase(this.flutterbotBase),
       snowball: this.fetchCommissionPaidTodayForBase(this.snowballBase),
+    }).pipe(
+      map(({ flutterbot, snowball }) => {
+        if (flutterbot === null && snowball === null) {
+          return null;
+        }
+        return (flutterbot ?? 0) + (snowball ?? 0);
+      })
+    );
+  }
+
+  private fetchCommissionPaidThisWeek(): Observable<number | null> {
+    return forkJoin({
+      flutterbot: this.fetchCommissionPaidThisWeekForBase(this.flutterbotBase),
+      snowball: this.fetchCommissionPaidThisWeekForBase(this.snowballBase),
     }).pipe(
       map(({ flutterbot, snowball }) => {
         if (flutterbot === null && snowball === null) {
@@ -215,25 +269,30 @@ export class ProfitService {
       inplay: this.fetchStats(this.flutterbotBase, 'InPlay: true, ', today, today),
       open: this.fetchOpenBets(),
       commissionPaidToday: this.fetchCommissionPaidToday(),
+      commissionPaidThisWeek: this.fetchCommissionPaidThisWeek(),
       upcomingRaces: this.fetchUpcomingRaces(),
     }).pipe(
-      map(({ normal, snowball, inplay, open, commissionPaidToday, upcomingRaces }) => ({
+      map(({ normal, snowball, inplay, open, commissionPaidToday, commissionPaidThisWeek, upcomingRaces }) => ({
         normalProfit: normal.profit,
         normalWeekToDateProfit: normal.weekToDateProfit,
         normalCashout: normal.cashoutValue,
+        normalWeekToDateCashout: normal.weekToDateCashoutValue,
         normalStale: normal.stale,
         snowballProfit: snowball.profit,
         snowballWeekToDateProfit: snowball.weekToDateProfit,
         snowballCashout: snowball.cashoutValue,
+        snowballWeekToDateCashout: snowball.weekToDateCashoutValue,
         snowballStale: snowball.stale,
         inplayProfit: inplay.profit,
         inplayWeekToDateProfit: inplay.weekToDateProfit,
         inplayExpected: inplay.expectedProfit,
+        inplayWeekToDateExpected: inplay.weekToDateExpectedProfit,
         inplayStale: inplay.stale,
         openStake: open.openStake,
         openAverageProfit: open.openAverageProfit,
         openLayValue: open.openLayValue,
         commissionPaidToday,
+        commissionPaidThisWeek,
         upcomingGBRaces: upcomingRaces,
         lastUpdated: new Date(),
       }))
