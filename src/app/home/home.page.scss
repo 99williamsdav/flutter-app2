@@ -42,6 +42,34 @@ ion-card {
   &.gross-neutral {
     background: linear-gradient(130deg, #111827, #374151 62%, #4b5563);
   }
+
+  .gross-sparkline {
+    margin: 10px 0 6px;
+    height: 34px;
+    width: 100%;
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .sparkline-baseline {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.35);
+      stroke-width: 1;
+      stroke-dasharray: 3 3;
+    }
+
+    .sparkline-line {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.9);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
 }
 
 .strategy-grid {

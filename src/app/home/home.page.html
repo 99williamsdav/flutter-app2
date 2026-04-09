@@ -27,6 +27,12 @@
               <div class="gross-value" [class.negative]="grossTotal !== null && grossTotal < 0" [class.positive]="grossTotal !== null && grossTotal > 0">
                 {{ formatCurrency(grossTotal) }}
               </div>
+              <div class="gross-sparkline" *ngIf="todayGrossSparklinePoints.length > 0">
+                <svg viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true">
+                  <path *ngIf="todayGrossBaselineY !== null" class="sparkline-baseline" [attr.d]="'M0 ' + todayGrossBaselineY + ' L100 ' + todayGrossBaselineY"></path>
+                  <path *ngIf="todayGrossSparklinePath" class="sparkline-line" [attr.d]="todayGrossSparklinePath"></path>
+                </svg>
+              </div>
               <div class="gross-subvalue">
                 Commission: {{ formatCurrency(data.commissionPaidToday) }}
               </div>
@@ -120,6 +126,12 @@
               <div class="section-label">This Week's Profit</div>
               <div class="gross-value" [class.negative]="grossWeekToDateTotal !== null && grossWeekToDateTotal < 0" [class.positive]="grossWeekToDateTotal !== null && grossWeekToDateTotal > 0">
                 {{ formatCurrency(grossWeekToDateTotal) }}
+              </div>
+              <div class="gross-sparkline" *ngIf="weekGrossSparklinePoints.length > 0">
+                <svg viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true">
+                  <path *ngIf="weekGrossBaselineY !== null" class="sparkline-baseline" [attr.d]="'M0 ' + weekGrossBaselineY + ' L100 ' + weekGrossBaselineY"></path>
+                  <path *ngIf="weekGrossSparklinePath" class="sparkline-line" [attr.d]="weekGrossSparklinePath"></path>
+                </svg>
               </div>
               <div class="gross-subvalue">
                 Commission: {{ formatCurrency(data.commissionPaidThisWeek) }}

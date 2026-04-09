@@ -11,7 +11,14 @@ export interface StatsData {
   weekToDateCashoutValue: number | null;
   expectedProfit: number | null;
   weekToDateExpectedProfit: number | null;
+  hourlyProfit: HourlyProfitPoint[];
+  weekToDateHourlyProfit: HourlyProfitPoint[];
   stale: boolean;
+}
+
+export interface HourlyProfitPoint {
+  bucket: string;
+  profit: number | null;
 }
 
 export interface OpenPosition {
@@ -35,16 +42,22 @@ export interface ProfitData {
   normalWeekToDateProfit: number | null;
   normalCashout: number | null;
   normalWeekToDateCashout: number | null;
+  normalHourlyProfit: HourlyProfitPoint[];
+  normalWeekToDateHourlyProfit: HourlyProfitPoint[];
   normalStale: boolean;
   snowballProfit: number | null;
   snowballWeekToDateProfit: number | null;
   snowballCashout: number | null;
   snowballWeekToDateCashout: number | null;
+  snowballHourlyProfit: HourlyProfitPoint[];
+  snowballWeekToDateHourlyProfit: HourlyProfitPoint[];
   snowballStale: boolean;
   inplayProfit: number | null;
   inplayWeekToDateProfit: number | null;
   inplayExpected: number | null;
   inplayWeekToDateExpected: number | null;
+  inplayHourlyProfit: HourlyProfitPoint[];
+  inplayWeekToDateHourlyProfit: HourlyProfitPoint[];
   inplayStale: boolean;
   openStake: number | null;
   openAverageProfit: number | null;
@@ -103,12 +116,59 @@ export class ProfitService {
     return `${date.toISOString().slice(0, 16)}Z`;
   }
 
+  private parseDateHourSeries(payload: any): HourlyProfitPoint[] {
+    const dateHour = payload?.DateHour;
+    if (!dateHour) {
+      return [];
+    }
+
+    const points: HourlyProfitPoint[] = [];
+
+    if (Array.isArray(dateHour)) {
+      for (const entry of dateHour) {
+        const bucket = typeof entry?.Bucket === 'string' ? entry.Bucket : null;
+        const profit = entry?.Net?.Profit;
+        if (!bucket) {
+          continue;
+        }
+
+        points.push({
+          bucket,
+          profit: typeof profit === 'number' ? profit : null,
+        });
+      }
+    } else if (typeof dateHour === 'object') {
+      for (const [key, value] of Object.entries<any>(dateHour)) {
+        const bucket =
+          typeof value?.Bucket === 'string'
+            ? value.Bucket
+            : typeof key === 'string'
+              ? key
+              : null;
+        const profit = value?.Net?.Profit;
+
+        if (!bucket) {
+          continue;
+        }
+
+        points.push({
+          bucket,
+          profit: typeof profit === 'number' ? profit : null,
+        });
+      }
+    }
+
+    return points
+      .filter(point => !Number.isNaN(Date.parse(point.bucket)))
+      .sort((a, b) => Date.parse(a.bucket) - Date.parse(b.bucket));
+  }
+
   private fetchStats(baseUrl: string, extraFilter: string, dateFrom: string, dateTo: string): Observable<StatsData> {
     const date = this.getToday();
     const weekStart = this.getStartOfWeek();
     const dsFilters = `{${extraFilter}Void: false}`;
-    const url = `${baseUrl}/stats?df=${dateFrom}&dt=${dateTo}&groupings=["All"]&dsFilters=${dsFilters}&specialFilters={}`;
-    const weekToDateUrl = `${baseUrl}/stats?df=${weekStart}&dt=${date}&groupings=["All"]&dsFilters=${dsFilters}&specialFilters={}`;
+    const url = `${baseUrl}/stats?df=${dateFrom}&dt=${dateTo}&groupings=["All","DateHour"]&dsFilters=${dsFilters}&specialFilters={}`;
+    const weekToDateUrl = `${baseUrl}/stats?df=${weekStart}&dt=${date}&groupings=["All","DateHour"]&dsFilters=${dsFilters}&specialFilters={}`;
 
     return forkJoin({
       day: this.http.get<any>(url),
@@ -124,6 +184,8 @@ export class ProfitService {
           weekToDateCashoutValue: weekNet?.CashoutValueExclLargeSpread ?? null,
           expectedProfit: dayNet?.ExpectedProfit ?? null,
           weekToDateExpectedProfit: weekNet?.ExpectedProfit ?? null,
+          hourlyProfit: this.parseDateHourSeries(day),
+          weekToDateHourlyProfit: this.parseDateHourSeries(week),
           stale: false,
         };
       }),
@@ -135,6 +197,8 @@ export class ProfitService {
           weekToDateCashoutValue: null,
           expectedProfit: null,
           weekToDateExpectedProfit: null,
+          hourlyProfit: [],
+          weekToDateHourlyProfit: [],
           stale: true,
         })
       )
@@ -277,16 +341,22 @@ export class ProfitService {
         normalWeekToDateProfit: normal.weekToDateProfit,
         normalCashout: normal.cashoutValue,
         normalWeekToDateCashout: normal.weekToDateCashoutValue,
+        normalHourlyProfit: normal.hourlyProfit,
+        normalWeekToDateHourlyProfit: normal.weekToDateHourlyProfit,
         normalStale: normal.stale,
         snowballProfit: snowball.profit,
         snowballWeekToDateProfit: snowball.weekToDateProfit,
         snowballCashout: snowball.cashoutValue,
         snowballWeekToDateCashout: snowball.weekToDateCashoutValue,
+        snowballHourlyProfit: snowball.hourlyProfit,
+        snowballWeekToDateHourlyProfit: snowball.weekToDateHourlyProfit,
         snowballStale: snowball.stale,
         inplayProfit: inplay.profit,
         inplayWeekToDateProfit: inplay.weekToDateProfit,
         inplayExpected: inplay.expectedProfit,
         inplayWeekToDateExpected: inplay.weekToDateExpectedProfit,
+        inplayHourlyProfit: inplay.hourlyProfit,
+        inplayWeekToDateHourlyProfit: inplay.weekToDateHourlyProfit,
         inplayStale: inplay.stale,
         openStake: open.openStake,
         openAverageProfit: open.openAverageProfit,
