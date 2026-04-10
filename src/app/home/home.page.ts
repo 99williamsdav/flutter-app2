@@ -17,6 +17,7 @@ import {
   IonRefresherContent,
 } from '@ionic/angular/standalone';
 import { HourlyProfitPoint, ProfitService, ProfitData } from '../services/profit.service';
+import { FireworksComponent } from './fireworks.component';
 
 @Component({
   selector: 'app-home',
@@ -37,10 +38,13 @@ import { HourlyProfitPoint, ProfitService, ProfitData } from '../services/profit
     IonCardContent,
     IonRefresher,
     IonRefresherContent,
+    FireworksComponent,
   ],
 })
 export class HomePage implements OnInit, OnDestroy {
   activeView: 'today' | 'week' = 'today';
+  showFireworks = false;
+  private fireworksShown = false;
   private touchStartX: number | null = null;
 
   data: ProfitData = {
@@ -102,6 +106,13 @@ export class HomePage implements OnInit, OnDestroy {
       .subscribe(result => {
         this.data = result;
         this.rebuildGrossSparklines();
+        if ((this.grossTotal ?? 0) <= 1000) {
+          this.fireworksShown = false;
+        }
+        if (!this.fireworksShown && (this.grossTotal ?? 0) > 1000) {
+          this.showFireworks = true;
+          this.fireworksShown = true;
+        }
       });
   }
 
