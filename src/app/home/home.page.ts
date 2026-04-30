@@ -75,6 +75,7 @@ export class HomePage implements OnInit, OnDestroy {
     commissionPaidToday: null,
     commissionPaidThisWeek: null,
     upcomingGBRaces: 0,
+    upcomingGBVenues: 0,
     lastUpdated: null,
   };
 

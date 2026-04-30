@@ -65,6 +65,7 @@ export interface ProfitData {
   commissionPaidToday: number | null;
   commissionPaidThisWeek: number | null;
   upcomingGBRaces: number;
+  upcomingGBVenues: number;
   lastUpdated: Date | null;
 }
 
@@ -229,7 +230,7 @@ export class ProfitService {
     );
   }
 
-  private fetchUpcomingRaces(): Observable<number> {
+  private fetchUpcomingRaces(): Observable<{ upcomingGBRaces: number; upcomingGBVenues: number }> {
     const now = new Date();
     const endOfLocalDay = new Date(now);
     endOfLocalDay.setHours(24, 0, 0, 0);
@@ -242,11 +243,22 @@ export class ProfitService {
     return this.http.get<RaceData[]>(url).pipe(
       map(races => {
         if (!races || !Array.isArray(races)) {
-          return 0;
+          return { upcomingGBRaces: 0, upcomingGBVenues: 0 };
         }
-        return races.filter(race => race.Country === 'GB').length;
+
+        const gbRaces = races.filter(race => race.Country === 'GB');
+        const distinctVenues = new Set(
+          gbRaces
+            .map(race => race.Venue?.trim())
+            .filter((venue): venue is string => Boolean(venue))
+        );
+
+        return {
+          upcomingGBRaces: gbRaces.length,
+          upcomingGBVenues: distinctVenues.size,
+        };
       }),
-      catchError(() => of(0))
+      catchError(() => of({ upcomingGBRaces: 0, upcomingGBVenues: 0 }))
     );
   }
 
@@ -363,7 +375,8 @@ export class ProfitService {
         openLayValue: open.openLayValue,
         commissionPaidToday,
         commissionPaidThisWeek,
-        upcomingGBRaces: upcomingRaces,
+        upcomingGBRaces: upcomingRaces.upcomingGBRaces,
+        upcomingGBVenues: upcomingRaces.upcomingGBVenues,
         lastUpdated: new Date(),
       }))
     );
