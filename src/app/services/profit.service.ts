@@ -27,6 +27,7 @@ export interface OpenPosition {
   ShortStake: number;
   AverageProfit: number;
   LayValue: number;
+  LayValueExclLargeSpread: number;
   Race: RaceData;
 }
 
@@ -220,7 +221,7 @@ export class ProfitService {
           (acc, bet) => {
             acc.openStake += bet.LongShort === 'Long' ? (bet.LongStake ?? 0) : (bet.ShortStake ?? 0);
             acc.openAverageProfit += bet.AverageProfit ?? 0;
-            acc.openLayValue += bet.LayValue ?? 0;
+            acc.openLayValue += bet.LayValueExclLargeSpread ?? 0;
             return acc;
           },
           { openStake: 0, openAverageProfit: 0, openLayValue: 0 }
