@@ -35,6 +35,10 @@ ion-card {
     background: linear-gradient(130deg, #166534, #15803d 60%, #22c55e);
   }
 
+  &.gross-amber {
+    background: linear-gradient(130deg, #92400e, #d97706 58%, #f59e0b);
+  }
+
   &.gross-negative {
     background: linear-gradient(130deg, #881337, #be123c 58%, #e11d48);
   }

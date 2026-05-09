@@ -335,4 +335,22 @@ export class HomePage implements OnInit, OnDestroy {
     if (p.normalWeekToDateProfit === null && p.snowballWeekToDateProfit === null && p.inplayWeekToDateProfit === null) return null;
     return (p.normalWeekToDateProfit ?? 0) + (p.snowballWeekToDateProfit ?? 0) + (p.inplayWeekToDateProfit ?? 0);
   }
+
+  get isTodayGrossAmber(): boolean {
+    return this.isGrossAmber(this.grossTotal, this.data.commissionPaidToday);
+  }
+
+  get isWeekGrossAmber(): boolean {
+    return this.isGrossAmber(this.grossWeekToDateTotal, this.data.commissionPaidThisWeek);
+  }
+
+  private isGrossAmber(totalProfit: number | null, totalCommission: number | null): boolean {
+    return (
+      totalProfit !== null &&
+      totalProfit > 0 &&
+      totalCommission !== null &&
+      totalCommission > 0 &&
+      totalProfit < totalCommission
+    );
+  }
 }
