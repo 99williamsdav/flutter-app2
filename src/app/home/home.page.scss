@@ -12,6 +12,11 @@ ion-content {
   --background: var(--page-bg);
 }
 
+ion-content.faded {
+  transition: opacity 240ms ease-in-out;
+  opacity: 0.6;
+}
+
 .home-shell {
   max-width: 960px;
   margin: 0 auto;

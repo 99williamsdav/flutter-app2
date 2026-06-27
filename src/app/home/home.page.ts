@@ -344,6 +344,13 @@ export class HomePage implements OnInit, OnDestroy {
     return this.isGrossAmber(this.grossWeekToDateTotal, this.data.commissionPaidThisWeek);
   }
 
+  get isLastUpdatedOld(): boolean {
+    const lu = this.data?.lastUpdated;
+    if (!lu) return true;
+    const ts = lu instanceof Date ? lu.getTime() : new Date(lu).getTime();
+    return Date.now() - ts > 10 * 60 * 1000;
+  }
+
   private isGrossAmber(totalProfit: number | null, totalCommission: number | null): boolean {
     return (
       totalProfit !== null &&
