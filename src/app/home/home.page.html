@@ -25,7 +25,7 @@
             [class.gross-neutral]="grossTotal === 0 || grossTotal === null"
           >
             <ion-card-content>
-              <div class="section-label">Today's Profit</div>
+              <div class="section-label">{{ todayProfitLabel }}</div>
               <div class="gross-value" [class.negative]="grossTotal !== null && grossTotal < 0" [class.positive]="grossTotal !== null && grossTotal > 0">
                 {{ formatCurrency(grossTotal) }}
               </div>

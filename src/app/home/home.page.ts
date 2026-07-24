@@ -90,6 +90,31 @@ export class HomePage implements OnInit, OnDestroy {
 
   constructor(private profitService: ProfitService) {}
 
+  get todayProfitLabel(): string {
+    const now = new Date();
+    const ukDate = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/London',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(now);
+    const localDate = new Intl.DateTimeFormat('en-GB', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(now);
+
+    if (ukDate === localDate) {
+      return "Today's Profit";
+    }
+
+    const weekday = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/London',
+      weekday: 'long',
+    }).format(now);
+    return `${weekday}'s Profit`;
+  }
+
   ngOnInit() {
     this.startPolling();
   }

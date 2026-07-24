@@ -76,27 +76,80 @@ export interface ProfitData {
 export class ProfitService {
   private readonly flutterbotBase = environment.flutterbotApiBase;
   private readonly snowballBase = environment.snowballApiBase;
+  private readonly ukTimeZone = 'Europe/London';
 
   constructor(private http: HttpClient) {}
 
+  private getUkDateParts(date = new Date()): { year: number; month: number; day: number } {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: this.ukTimeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(date);
+
+    const part = (type: string) => Number(parts.find(item => item.type === type)?.value);
+    return { year: part('year'), month: part('month'), day: part('day') };
+  }
+
+  private formatDate({ year, month, day }: { year: number; month: number; day: number }): string {
+    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  }
+
   private getToday(): string {
-    const now = new Date();
-    const yyyy = now.getFullYear();
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const dd = String(now.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
+    return this.formatDate(this.getUkDateParts());
   }
 
   private getStartOfWeek(): string {
-    const now = new Date();
-    const mondayBasedDay = (now.getDay() + 6) % 7;
-    const start = new Date(now);
-    start.setDate(now.getDate() - mondayBasedDay);
+    const today = this.getUkDateParts();
+    const ukCalendarDate = new Date(Date.UTC(today.year, today.month - 1, today.day));
+    const mondayBasedDay = (ukCalendarDate.getUTCDay() + 6) % 7;
+    ukCalendarDate.setUTCDate(ukCalendarDate.getUTCDate() - mondayBasedDay);
 
-    const yyyy = start.getFullYear();
-    const mm = String(start.getMonth() + 1).padStart(2, '0');
-    const dd = String(start.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
+    return this.formatDate({
+      year: ukCalendarDate.getUTCFullYear(),
+      month: ukCalendarDate.getUTCMonth() + 1,
+      day: ukCalendarDate.getUTCDate(),
+    });
+  }
+
+  /** Returns the actual UTC instant at the start of a UK calendar date. */
+  private getUkMidnight(date: { year: number; month: number; day: number }): Date {
+    const midnightAsUtc = new Date(Date.UTC(date.year, date.month - 1, date.day));
+    const ukParts = new Intl.DateTimeFormat('en-GB', {
+      timeZone: this.ukTimeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(midnightAsUtc);
+    const part = (type: string) => Number(ukParts.find(item => item.type === type)?.value);
+    const displayedAsUtc = Date.UTC(
+      part('year'),
+      part('month') - 1,
+      part('day'),
+      part('hour'),
+      part('minute'),
+      part('second')
+    );
+    const ukOffsetMs = displayedAsUtc - midnightAsUtc.getTime();
+
+    return new Date(midnightAsUtc.getTime() - ukOffsetMs);
+  }
+
+  private getStartOfUkWeek(): Date {
+    const today = this.getUkDateParts();
+    const ukCalendarDate = new Date(Date.UTC(today.year, today.month - 1, today.day));
+    ukCalendarDate.setUTCDate(ukCalendarDate.getUTCDate() - ((ukCalendarDate.getUTCDay() + 6) % 7));
+
+    return this.getUkMidnight({
+      year: ukCalendarDate.getUTCFullYear(),
+      month: ukCalendarDate.getUTCMonth() + 1,
+      day: ukCalendarDate.getUTCDate(),
+    });
   }
 
   private isRaceToday(raceDate: Date | string | null | undefined): boolean {
@@ -108,10 +161,7 @@ export class ProfitService {
       return raceDate.slice(0, 10) === this.getToday();
     }
 
-    const yyyy = raceDate.getFullYear();
-    const mm = String(raceDate.getMonth() + 1).padStart(2, '0');
-    const dd = String(raceDate.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}` === this.getToday();
+    return this.formatDate(this.getUkDateParts(raceDate)) === this.getToday();
   }
 
   private formatUtcQueryParam(date: Date): string {
@@ -233,11 +283,16 @@ export class ProfitService {
 
   private fetchUpcomingRaces(): Observable<{ upcomingGBRaces: number; upcomingGBVenues: number }> {
     const now = new Date();
-    const endOfLocalDay = new Date(now);
-    endOfLocalDay.setHours(24, 0, 0, 0);
+    const ukToday = this.getUkDateParts(now);
+    const nextUkDay = new Date(Date.UTC(ukToday.year, ukToday.month - 1, ukToday.day + 1));
+    const endOfUkDay = this.getUkMidnight({
+      year: nextUkDay.getUTCFullYear(),
+      month: nextUkDay.getUTCMonth() + 1,
+      day: nextUkDay.getUTCDate(),
+    });
 
     const dateFromString = this.formatUtcQueryParam(now);
-    const dateToString = this.formatUtcQueryParam(endOfLocalDay);
+    const dateToString = this.formatUtcQueryParam(endOfUkDay);
 
     const url = `${this.flutterbotBase}/races?df=${encodeURIComponent(dateFromString)}&dt=${encodeURIComponent(dateToString)}`;
 
@@ -265,10 +320,9 @@ export class ProfitService {
 
   private fetchCommissionPaidTodayForBase(baseUrl: string): Observable<number | null> {
     const now = new Date();
-    const startOfLocalDay = new Date(now);
-    startOfLocalDay.setHours(0, 0, 0, 0);
+    const startOfUkDay = this.getUkMidnight(this.getUkDateParts(now));
 
-    const dateFromString = this.formatUtcQueryParam(startOfLocalDay);
+    const dateFromString = this.formatUtcQueryParam(startOfUkDay);
     const dateToString = this.formatUtcQueryParam(now);
 
     const url = `${baseUrl}/races?df=${encodeURIComponent(dateFromString)}&dt=${encodeURIComponent(dateToString)}`;
@@ -287,10 +341,7 @@ export class ProfitService {
 
   private fetchCommissionPaidThisWeekForBase(baseUrl: string): Observable<number | null> {
     const now = new Date();
-    const mondayBasedDay = (now.getDay() + 6) % 7;
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - mondayBasedDay);
-    startOfWeek.setHours(0, 0, 0, 0);
+    const startOfWeek = this.getStartOfUkWeek();
 
     const dateFromString = this.formatUtcQueryParam(startOfWeek);
     const dateToString = this.formatUtcQueryParam(now);
