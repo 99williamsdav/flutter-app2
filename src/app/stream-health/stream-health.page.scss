@@ -1,0 +1,83 @@
+:host {
+  --page-bg: radial-gradient(circle at 12% 0%, #fff3db 0%, #f7f5f0 45%, #edf2fb 100%);
+}
+
+ion-content {
+  --background: var(--page-bg);
+}
+
+.health-shell {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.health-card {
+  margin: 0 0 16px;
+  border: 1px solid rgba(71, 84, 103, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 12px 28px rgba(16, 24, 40, 0.08);
+}
+
+.health-heading,
+.metrics {
+  display: flex;
+  align-items: center;
+}
+
+.health-heading {
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.eyebrow,
+.updated,
+.metric-label {
+  color: #667085;
+  font-size: 0.75rem;
+}
+
+.metrics {
+  gap: 0;
+}
+
+.metric {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 12px;
+  border-left: 1px solid rgba(71, 84, 103, 0.12);
+}
+
+.metric:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.metric-value {
+  color: #243042;
+  font-size: clamp(1.1rem, 4vw, 1.45rem);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+@media (max-width: 390px) {
+  .metrics {
+    align-items: stretch;
+  }
+
+  .metric {
+    padding: 0 8px;
+  }
+
+  .metric-label {
+    font-size: 0.68rem;
+  }
+
+  .metric-value {
+    font-size: 1rem;
+  }
+}

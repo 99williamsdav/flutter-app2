@@ -14,4 +14,8 @@ export const routes: Routes = [
     path: 'about',
     loadComponent: () => import('./about/about.page').then(m => m.AboutPage),
   },
+  {
+    path: 'stream-health',
+    loadComponent: () => import('./stream-health/stream-health.page').then(m => m.StreamHealthPage),
+  },
 ];

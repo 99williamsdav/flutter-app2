@@ -15,7 +15,7 @@ import {
   IonRouterOutlet,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { homeOutline, homeSharp, informationCircleOutline, informationCircleSharp } from 'ionicons/icons';
+import { homeOutline, homeSharp, informationCircleOutline, informationCircleSharp, pulseOutline, pulseSharp } from 'ionicons/icons';
 
 @Component({
   selector: 'app-root',
@@ -42,6 +42,7 @@ import { homeOutline, homeSharp, informationCircleOutline, informationCircleShar
 export class AppComponent {
   public appPages = [
     { title: 'Home', url: '/home', icon: 'home' },
+    { title: 'Stream Health', url: '/stream-health', icon: 'pulse' },
     { title: 'About', url: '/about', icon: 'information-circle' },
   ];
 
@@ -51,6 +52,8 @@ export class AppComponent {
       homeSharp,
       informationCircleOutline,
       informationCircleSharp,
+      pulseOutline,
+      pulseSharp,
     });
   }
 }

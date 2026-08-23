@@ -1,0 +1,73 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Stream Health</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <main class="health-shell ion-padding">
+    <ion-card class="health-card" [class.unavailable]="data.unavailable">
+      <ion-card-content>
+        <div class="health-heading">
+          <div class="eyebrow">Last {{ data.windowMinutes }} minutes</div>
+          <div class="updated">{{ formatTime(lastUpdated) }}</div>
+        </div>
+
+        <div class="metrics" aria-label="Stream processing metrics">
+          <div class="metric">
+            <span class="metric-value">{{ formatRate(data.updatesPerMinute) }}</span>
+            <span class="metric-label">updates / min</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">{{ formatRate(data.analysesPerMinute) }}</span>
+            <span class="metric-label">analyses / min</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">{{ formatLatency(data.analysisLatencyMs) }}</span>
+            <span class="metric-label">analysis latency</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">{{ formatPercent(data.analysesPerMcmPercent) }}</span>
+            <span class="metric-label">analyses / MCM</span>
+          </div>
+        </div>
+
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="health-card" [class.unavailable]="hourData.unavailable">
+      <ion-card-content>
+        <div class="health-heading">
+          <div class="eyebrow">Last {{ hourData.windowMinutes / 60 }} hour</div>
+          <div class="updated">{{ formatTime(lastUpdated) }}</div>
+        </div>
+
+        <div class="metrics" aria-label="One-hour stream processing metrics">
+          <div class="metric">
+            <span class="metric-value">{{ formatRate(hourData.updatesPerMinute) }}</span>
+            <span class="metric-label">updates / min</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">{{ formatRate(hourData.analysesPerMinute) }}</span>
+            <span class="metric-label">analyses / min</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">{{ formatLatency(hourData.analysisLatencyMs) }}</span>
+            <span class="metric-label">analysis latency</span>
+          </div>
+          <div class="metric">
+            <span class="metric-value">{{ formatPercent(hourData.analysesPerMcmPercent) }}</span>
+            <span class="metric-label">analyses / MCM</span>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </main>
+</ion-content>
