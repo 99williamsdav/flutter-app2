@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
 import {
@@ -88,7 +89,10 @@ export class HomePage implements OnInit, OnDestroy {
 
   private pollSub?: Subscription;
 
-  constructor(private profitService: ProfitService) {}
+  constructor(
+    private profitService: ProfitService,
+    private router: Router,
+  ) {}
 
   get todayProfitLabel(): string {
     const now = new Date();
@@ -322,8 +326,15 @@ export class HomePage implements OnInit, OnDestroy {
       return;
     }
 
-    this.activeView = swipeDelta < 0 ? 'week' : 'today';
     this.touchStartX = null;
+
+    if (swipeDelta < 0) {
+      this.activeView = 'week';
+    } else if (this.activeView === 'today') {
+      void this.router.navigateByUrl('/stream-health');
+    } else {
+      this.activeView = 'today';
+    }
   }
 
   formatCurrency(value: number | null, includePositiveSign = false): string {
