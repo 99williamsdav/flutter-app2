@@ -52,6 +52,14 @@ export class StreamHealthPage implements OnInit, OnDestroy {
     windowMinutes: 60,
     unavailable: false,
   };
+  threeHourData: StreamHealthData = {
+    updatesPerMinute: null,
+    analysesPerMinute: null,
+    analysesPerMcmPercent: null,
+    analysisLatencyMs: null,
+    windowMinutes: 180,
+    unavailable: false,
+  };
   lastUpdated: Date | null = null;
   private pollSub?: Subscription;
 
@@ -61,9 +69,10 @@ export class StreamHealthPage implements OnInit, OnDestroy {
     this.pollSub = interval(10000).pipe(
       startWith(0),
       switchMap(() => this.fetchMetrics())
-    ).subscribe(({ quarterHour, hour }) => {
+    ).subscribe(({ quarterHour, hour, threeHours }) => {
       this.data = quarterHour;
       this.hourData = hour;
+      this.threeHourData = threeHours;
       this.lastUpdated = new Date();
     });
   }
@@ -73,9 +82,10 @@ export class StreamHealthPage implements OnInit, OnDestroy {
   }
 
   handleRefresh(event: CustomEvent): void {
-    this.fetchMetrics().subscribe(({ quarterHour, hour }) => {
+    this.fetchMetrics().subscribe(({ quarterHour, hour, threeHours }) => {
       this.data = quarterHour;
       this.hourData = hour;
+      this.threeHourData = threeHours;
       this.lastUpdated = new Date();
       (event.target as HTMLIonRefresherElement).complete();
     });
@@ -104,6 +114,7 @@ export class StreamHealthPage implements OnInit, OnDestroy {
     return forkJoin({
       quarterHour: this.streamHealthService.fetch(15),
       hour: this.streamHealthService.fetch(60),
+      threeHours: this.streamHealthService.fetch(180),
     });
   }
 }
