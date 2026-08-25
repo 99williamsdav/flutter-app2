@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { forkJoin, Subscription, interval } from 'rxjs';
-import { startWith, switchMap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import {
   IonButtons,
   IonCard,
@@ -14,7 +14,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { StreamHealthData, StreamHealthService } from '../services/stream-health.service';
+import { StreamHealthData, StreamHealthService, StreamHealthSnapshot } from '../services/stream-health.service';
 
 @Component({
   selector: 'app-stream-health',
@@ -52,28 +52,19 @@ export class StreamHealthPage implements OnInit, OnDestroy {
     windowMinutes: 60,
     unavailable: false,
   };
-  threeHourData: StreamHealthData = {
-    updatesPerMinute: null,
-    analysesPerMinute: null,
-    analysesPerMcmPercent: null,
-    analysisLatencyMs: null,
-    windowMinutes: 180,
-    unavailable: false,
-  };
   lastUpdated: Date | null = null;
   private pollSub?: Subscription;
+  private touchStartX: number | null = null;
 
-  constructor(private streamHealthService: StreamHealthService) {}
+  constructor(
+    private streamHealthService: StreamHealthService,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
-    this.pollSub = interval(10000).pipe(
-      startWith(0),
-      switchMap(() => this.fetchMetrics())
-    ).subscribe(({ quarterHour, hour, threeHours }) => {
-      this.data = quarterHour;
-      this.hourData = hour;
-      this.threeHourData = threeHours;
-      this.lastUpdated = new Date();
+    this.streamHealthService.startPolling();
+    this.pollSub = this.streamHealthService.snapshot$.subscribe(snapshot => {
+      if (snapshot) this.applySnapshot(snapshot);
     });
   }
 
@@ -82,13 +73,27 @@ export class StreamHealthPage implements OnInit, OnDestroy {
   }
 
   handleRefresh(event: CustomEvent): void {
-    this.fetchMetrics().subscribe(({ quarterHour, hour, threeHours }) => {
-      this.data = quarterHour;
-      this.hourData = hour;
-      this.threeHourData = threeHours;
-      this.lastUpdated = new Date();
+    this.streamHealthService.refresh().subscribe(() => {
       (event.target as HTMLIonRefresherElement).complete();
     });
+  }
+
+  handleTouchStart(event: TouchEvent): void {
+    this.touchStartX = event.changedTouches[0]?.clientX ?? null;
+  }
+
+  handleTouchEnd(event: TouchEvent): void {
+    const touchEndX = event.changedTouches[0]?.clientX;
+    if (this.touchStartX === null || touchEndX === undefined) {
+      return;
+    }
+
+    const swipeDelta = touchEndX - this.touchStartX;
+    this.touchStartX = null;
+
+    if (swipeDelta <= -45) {
+      void this.router.navigateByUrl('/home');
+    }
   }
 
   formatRate(value: number | null): string {
@@ -110,11 +115,9 @@ export class StreamHealthPage implements OnInit, OnDestroy {
     return value.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
-  private fetchMetrics() {
-    return forkJoin({
-      quarterHour: this.streamHealthService.fetch(15),
-      hour: this.streamHealthService.fetch(60),
-      threeHours: this.streamHealthService.fetch(180),
-    });
+  private applySnapshot(snapshot: StreamHealthSnapshot): void {
+    this.data = snapshot.quarterHour;
+    this.hourData = snapshot.hour;
+    this.lastUpdated = snapshot.updatedAt;
   }
 }

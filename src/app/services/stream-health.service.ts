@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { BehaviorSubject, forkJoin, Observable, of, Subscription, timer } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface StreamHealthData {
@@ -13,9 +13,41 @@ export interface StreamHealthData {
   unavailable: boolean;
 }
 
+export interface StreamHealthSnapshot {
+  quarterHour: StreamHealthData;
+  hour: StreamHealthData;
+  updatedAt: Date;
+}
+
 @Injectable({ providedIn: 'root' })
 export class StreamHealthService {
+  private readonly snapshotSubject = new BehaviorSubject<StreamHealthSnapshot | null>(null);
+  private pollingSub?: Subscription;
+
+  readonly snapshot$ = this.snapshotSubject.asObservable();
+
   constructor(private http: HttpClient) {}
+
+  startPolling(): void {
+    if (this.pollingSub) return;
+
+    this.pollingSub = timer(0, 10000).pipe(
+      switchMap(() => this.refresh())
+    ).subscribe();
+  }
+
+  refresh(): Observable<StreamHealthSnapshot> {
+    return forkJoin({
+      quarterHour: this.fetch(15),
+      hour: this.fetch(60),
+    }).pipe(
+      map(metrics => ({ ...metrics, updatedAt: new Date() })),
+      map(snapshot => {
+        this.snapshotSubject.next(snapshot);
+        return snapshot;
+      })
+    );
+  }
 
   fetch(minutes = 15): Observable<StreamHealthData> {
     const endpoint = `${environment.flutterbotApiBase}/stream-health?minutes=${minutes}`;

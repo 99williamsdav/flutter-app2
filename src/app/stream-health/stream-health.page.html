@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" (touchstart)="handleTouchStart($event)" (touchend)="handleTouchEnd($event)">
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -70,32 +70,5 @@
       </ion-card-content>
     </ion-card>
 
-    <ion-card class="health-card" [class.unavailable]="threeHourData.unavailable">
-      <ion-card-content>
-        <div class="health-heading">
-          <div class="eyebrow">Last {{ threeHourData.windowMinutes / 60 }} hours</div>
-          <div class="updated">{{ formatTime(lastUpdated) }}</div>
-        </div>
-
-        <div class="metrics" aria-label="Three-hour stream processing metrics">
-          <div class="metric">
-            <span class="metric-value">{{ formatRate(threeHourData.updatesPerMinute) }}</span>
-            <span class="metric-label">updates / min</span>
-          </div>
-          <div class="metric">
-            <span class="metric-value">{{ formatRate(threeHourData.analysesPerMinute) }}</span>
-            <span class="metric-label">analyses / min</span>
-          </div>
-          <div class="metric">
-            <span class="metric-value">{{ formatLatency(threeHourData.analysisLatencyMs) }}</span>
-            <span class="metric-label">analysis latency</span>
-          </div>
-          <div class="metric">
-            <span class="metric-value">{{ formatPercent(threeHourData.analysesPerMcmPercent) }}</span>
-            <span class="metric-label">analyses / MCM</span>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
   </main>
 </ion-content>

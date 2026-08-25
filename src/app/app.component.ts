@@ -16,6 +16,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { homeOutline, homeSharp, informationCircleOutline, informationCircleSharp, pulseOutline, pulseSharp } from 'ionicons/icons';
+import { StreamHealthService } from './services/stream-health.service';
 
 @Component({
   selector: 'app-root',
@@ -46,7 +47,7 @@ export class AppComponent {
     { title: 'About', url: '/about', icon: 'information-circle' },
   ];
 
-  constructor() {
+  constructor(streamHealthService: StreamHealthService) {
     addIcons({
       homeOutline,
       homeSharp,
@@ -55,5 +56,6 @@ export class AppComponent {
       pulseOutline,
       pulseSharp,
     });
+    streamHealthService.startPolling();
   }
 }
