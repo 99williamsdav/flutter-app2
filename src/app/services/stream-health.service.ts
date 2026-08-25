@@ -9,6 +9,10 @@ export interface StreamHealthData {
   analysesPerMinute: number | null;
   analysesPerMcmPercent: number | null;
   analysisLatencyMs: number | null;
+  floatBetsPlaced: number | null;
+  betsImmediatelyFullyMatched: number | null;
+  betsImmediatelyPartiallyMatched: number | null;
+  betsImmediatelyUnmatched: number | null;
   windowMinutes: number;
   unavailable: boolean;
 }
@@ -80,6 +84,10 @@ export class StreamHealthService {
             'analysisLatencyMs', 'averageAnalysisLatencyMs', 'avgAnalysisLatencyMs', 'analysis_latency_ms',
             'analysisLatencyMilliseconds', 'averageAnalysisLatencyMilliseconds', 'avgAnalysisLatencyMilliseconds',
           ]),
+          floatBetsPlaced: this.numberFrom(summary, ['floatBetsPlaced']),
+          betsImmediatelyFullyMatched: this.numberFrom(summary, ['betsImmediatelyFullyMatched']),
+          betsImmediatelyPartiallyMatched: this.numberFrom(summary, ['betsImmediatelyPartiallyMatched']),
+          betsImmediatelyUnmatched: this.numberFrom(summary, ['betsImmediatelyUnmatched']),
           windowMinutes: this.numberFrom(payload, ['windowMinutes', 'minutes']) ?? minutes,
           unavailable: false,
         };
@@ -89,6 +97,10 @@ export class StreamHealthService {
         analysesPerMinute: null,
         analysesPerMcmPercent: null,
         analysisLatencyMs: null,
+        floatBetsPlaced: null,
+        betsImmediatelyFullyMatched: null,
+        betsImmediatelyPartiallyMatched: null,
+        betsImmediatelyUnmatched: null,
         windowMinutes: minutes,
         unavailable: true,
       }))

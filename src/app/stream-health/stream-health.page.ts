@@ -41,6 +41,10 @@ export class StreamHealthPage implements OnInit, OnDestroy {
     analysesPerMinute: null,
     analysesPerMcmPercent: null,
     analysisLatencyMs: null,
+    floatBetsPlaced: null,
+    betsImmediatelyFullyMatched: null,
+    betsImmediatelyPartiallyMatched: null,
+    betsImmediatelyUnmatched: null,
     windowMinutes: 15,
     unavailable: false,
   };
@@ -49,6 +53,10 @@ export class StreamHealthPage implements OnInit, OnDestroy {
     analysesPerMinute: null,
     analysesPerMcmPercent: null,
     analysisLatencyMs: null,
+    floatBetsPlaced: null,
+    betsImmediatelyFullyMatched: null,
+    betsImmediatelyPartiallyMatched: null,
+    betsImmediatelyUnmatched: null,
     windowMinutes: 60,
     unavailable: false,
   };
@@ -96,6 +104,10 @@ export class StreamHealthPage implements OnInit, OnDestroy {
     }
   }
 
+  formatWholeRate(value: number | null): string {
+    return value === null ? '—' : Math.round(value).toLocaleString();
+  }
+
   formatRate(value: number | null): string {
     return value === null ? '—' : value.toLocaleString(undefined, { maximumFractionDigits: 1 });
   }
@@ -104,6 +116,10 @@ export class StreamHealthPage implements OnInit, OnDestroy {
     if (value === null) return '—';
     if (value >= 1000) return `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)} s`;
     return `${Math.round(value)} ms`;
+  }
+
+  formatCount(value: number | null): string {
+    return value === null ? 'â€”' : value.toLocaleString();
   }
 
   formatPercent(value: number | null): string {

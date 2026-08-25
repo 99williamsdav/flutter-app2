@@ -13,6 +13,8 @@
   </ion-refresher>
 
   <main class="health-shell ion-padding">
+    <section class="health-section" aria-labelledby="analyses-heading">
+      <h2 id="analyses-heading">Analyses</h2>
     <ion-card class="health-card" [class.unavailable]="data.unavailable">
       <ion-card-content>
         <div class="health-heading">
@@ -22,20 +24,20 @@
 
         <div class="metrics" aria-label="Stream processing metrics">
           <div class="metric">
-            <span class="metric-value">{{ formatRate(data.updatesPerMinute) }}</span>
+            <span class="metric-value">{{ formatWholeRate(data.updatesPerMinute) }}</span>
             <span class="metric-label">updates / min</span>
           </div>
           <div class="metric">
-            <span class="metric-value">{{ formatRate(data.analysesPerMinute) }}</span>
-            <span class="metric-label">analyses / min</span>
+            <span class="metric-value">{{ formatWholeRate(data.analysesPerMinute) }}</span>
+            <span class="metric-label">/ min</span>
           </div>
           <div class="metric">
             <span class="metric-value">{{ formatLatency(data.analysisLatencyMs) }}</span>
-            <span class="metric-label">analysis latency</span>
+            <span class="metric-label">latency</span>
           </div>
           <div class="metric">
             <span class="metric-value">{{ formatPercent(data.analysesPerMcmPercent) }}</span>
-            <span class="metric-label">analyses / MCM</span>
+            <span class="metric-label">/ MCM</span>
           </div>
         </div>
 
@@ -51,24 +53,58 @@
 
         <div class="metrics" aria-label="One-hour stream processing metrics">
           <div class="metric">
-            <span class="metric-value">{{ formatRate(hourData.updatesPerMinute) }}</span>
+            <span class="metric-value">{{ formatWholeRate(hourData.updatesPerMinute) }}</span>
             <span class="metric-label">updates / min</span>
           </div>
           <div class="metric">
-            <span class="metric-value">{{ formatRate(hourData.analysesPerMinute) }}</span>
-            <span class="metric-label">analyses / min</span>
+            <span class="metric-value">{{ formatWholeRate(hourData.analysesPerMinute) }}</span>
+            <span class="metric-label">/ min</span>
           </div>
           <div class="metric">
             <span class="metric-value">{{ formatLatency(hourData.analysisLatencyMs) }}</span>
-            <span class="metric-label">analysis latency</span>
+            <span class="metric-label">latency</span>
           </div>
           <div class="metric">
             <span class="metric-value">{{ formatPercent(hourData.analysesPerMcmPercent) }}</span>
-            <span class="metric-label">analyses / MCM</span>
+            <span class="metric-label">/ MCM</span>
           </div>
         </div>
       </ion-card-content>
     </ion-card>
+    </section>
+
+    <section class="health-section" aria-labelledby="bets-heading">
+      <h2 id="bets-heading">Bets</h2>
+      <ion-card class="health-card" [class.unavailable]="data.unavailable">
+        <ion-card-content>
+          <div class="health-heading">
+            <div class="eyebrow">Last {{ data.windowMinutes }} minutes</div>
+            <div class="updated">{{ formatTime(lastUpdated) }}</div>
+          </div>
+          <div class="metrics bet-metrics" aria-label="15-minute bet metrics">
+            <div class="metric"><span class="metric-value">{{ formatCount(data.floatBetsPlaced) }}</span><span class="metric-label">floats</span></div>
+            <div class="metric"><span class="metric-value">{{ formatCount(data.betsImmediatelyFullyMatched) }}</span><span class="metric-label">immediately fully matched</span></div>
+            <div class="metric"><span class="metric-value">{{ formatCount(data.betsImmediatelyPartiallyMatched) }}</span><span class="metric-label">immediately partially matched</span></div>
+            <div class="metric"><span class="metric-value">{{ formatCount(data.betsImmediatelyUnmatched) }}</span><span class="metric-label">immediately not matched</span></div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="health-card" [class.unavailable]="hourData.unavailable">
+        <ion-card-content>
+          <div class="health-heading">
+            <div class="eyebrow">Last {{ hourData.windowMinutes / 60 }} hour</div>
+            <div class="updated">{{ formatTime(lastUpdated) }}</div>
+          </div>
+          <div class="metrics bet-metrics" aria-label="One-hour bet metrics">
+            <div class="metric"><span class="metric-value">{{ formatCount(hourData.floatBetsPlaced) }}</span><span class="metric-label">floats</span></div>
+            <div class="metric"><span class="metric-value">{{ formatCount(hourData.betsImmediatelyFullyMatched) }}</span><span class="metric-label">immediately fully matched</span></div>
+            <div class="metric"><span class="metric-value">{{ formatCount(hourData.betsImmediatelyPartiallyMatched) }}</span><span class="metric-label">immediately partially matched</span></div>
+            <div class="metric"><span class="metric-value">{{ formatCount(hourData.betsImmediatelyUnmatched) }}</span><span class="metric-label">immediately not matched</span></div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </section>
 
   </main>
 </ion-content>

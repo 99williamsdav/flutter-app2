@@ -19,6 +19,17 @@ ion-content {
   box-shadow: 0 12px 28px rgba(16, 24, 40, 0.08);
 }
 
+.health-section {
+  margin-bottom: 28px;
+}
+
+.health-section h2 {
+  margin: 0 0 10px 4px;
+  color: #344054;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
 .health-heading,
 .metrics {
   display: flex;
@@ -62,6 +73,10 @@ ion-content {
   font-weight: 700;
   line-height: 1.2;
   white-space: nowrap;
+}
+
+.bet-metrics .metric-label {
+  line-height: 1.25;
 }
 
 @media (max-width: 390px) {
