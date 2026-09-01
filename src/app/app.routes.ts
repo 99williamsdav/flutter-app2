@@ -16,6 +16,7 @@ export const routes: Routes = [
   },
   {
     path: 'stream-health',
-    loadComponent: () => import('./stream-health/stream-health.page').then(m => m.StreamHealthPage),
+    redirectTo: 'home',
+    pathMatch: 'full',
   },
 ];

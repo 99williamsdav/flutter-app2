@@ -15,7 +15,7 @@
 
   <div class="home-shell ion-padding">
     <div class="swipe-viewport" (touchstart)="handleTouchStart($event)" (touchend)="handleTouchEnd($event)">
-      <div class="swipe-track" [class.week-active]="activeView === 'week'">
+      <div class="swipe-track" [class.week-active]="activeView === 'week'" [class.stream-health-active]="activeView === 'streamHealth'">
         <section class="swipe-panel">
           <ion-card
             class="hero-card"
@@ -196,11 +196,66 @@
             </ion-card>
           </div>
         </section>
+        <section class="swipe-panel stream-health-panel" aria-label="Stream Health">
+          <h2>Stream Health</h2>
+
+          <section class="health-section" aria-labelledby="analyses-heading">
+            <h3 id="analyses-heading">Analyses</h3>
+            <ion-card class="stream-health-card" [class.unavailable]="streamHealthData.unavailable">
+              <ion-card-content>
+                <div class="health-heading"><div>Last {{ streamHealthData.windowMinutes }} minutes</div><div>{{ formatTime(streamHealthLastUpdated) }}</div></div>
+                <div class="health-metrics">
+                  <div class="health-metric"><span>{{ formatWholeRate(streamHealthData.updatesPerMinute) }}</span><small>updates / min</small></div>
+                  <div class="health-metric"><span>{{ formatWholeRate(streamHealthData.analysesPerMinute) }}</span><small>/ min</small></div>
+                  <div class="health-metric"><span>{{ formatLatency(streamHealthData.analysisLatencyMs) }}</span><small>latency</small></div>
+                  <div class="health-metric"><span>{{ formatPercent(streamHealthData.analysesPerMcmPercent) }}</span><small>/ MCM</small></div>
+                </div>
+              </ion-card-content>
+            </ion-card>
+            <ion-card class="stream-health-card" [class.unavailable]="streamHealthHourData.unavailable">
+              <ion-card-content>
+                <div class="health-heading"><div>Last {{ streamHealthHourData.windowMinutes / 60 }} hour</div><div>{{ formatTime(streamHealthLastUpdated) }}</div></div>
+                <div class="health-metrics">
+                  <div class="health-metric"><span>{{ formatWholeRate(streamHealthHourData.updatesPerMinute) }}</span><small>updates / min</small></div>
+                  <div class="health-metric"><span>{{ formatWholeRate(streamHealthHourData.analysesPerMinute) }}</span><small>/ min</small></div>
+                  <div class="health-metric"><span>{{ formatLatency(streamHealthHourData.analysisLatencyMs) }}</span><small>latency</small></div>
+                  <div class="health-metric"><span>{{ formatPercent(streamHealthHourData.analysesPerMcmPercent) }}</span><small>/ MCM</small></div>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </section>
+
+          <section class="health-section" aria-labelledby="bets-heading">
+            <h3 id="bets-heading">Bets</h3>
+            <ion-card class="stream-health-card" [class.unavailable]="streamHealthData.unavailable">
+              <ion-card-content>
+                <div class="health-heading"><div>Last {{ streamHealthData.windowMinutes }} minutes</div><div>{{ formatTime(streamHealthLastUpdated) }}</div></div>
+                <div class="health-metrics">
+                  <div class="health-metric"><span>{{ formatCount(streamHealthData.floatBetsPlaced) }}</span><small>floats</small></div>
+                  <div class="health-metric"><span>{{ formatCount(streamHealthData.betsImmediatelyFullyMatched) }}</span><small>immediately fully matched</small></div>
+                  <div class="health-metric"><span>{{ formatCount(streamHealthData.betsImmediatelyPartiallyMatched) }}</span><small>immediately partially matched</small></div>
+                  <div class="health-metric"><span>{{ formatCount(streamHealthData.betsImmediatelyUnmatched) }}</span><small>immediately not matched</small></div>
+                </div>
+              </ion-card-content>
+            </ion-card>
+            <ion-card class="stream-health-card" [class.unavailable]="streamHealthHourData.unavailable">
+              <ion-card-content>
+                <div class="health-heading"><div>Last {{ streamHealthHourData.windowMinutes / 60 }} hour</div><div>{{ formatTime(streamHealthLastUpdated) }}</div></div>
+                <div class="health-metrics">
+                  <div class="health-metric"><span>{{ formatCount(streamHealthHourData.floatBetsPlaced) }}</span><small>floats</small></div>
+                  <div class="health-metric"><span>{{ formatCount(streamHealthHourData.betsImmediatelyFullyMatched) }}</span><small>immediately fully matched</small></div>
+                  <div class="health-metric"><span>{{ formatCount(streamHealthHourData.betsImmediatelyPartiallyMatched) }}</span><small>immediately partially matched</small></div>
+                  <div class="health-metric"><span>{{ formatCount(streamHealthHourData.betsImmediatelyUnmatched) }}</span><small>immediately not matched</small></div>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </section>
+        </section>
       </div>
     </div>
 
     <div class="footnote">
-      Last updated: {{ formatTime(data.lastUpdated) }}
+      Last updated: {{ formatTime(activeView === 'streamHealth' ? streamHealthLastUpdated : data.lastUpdated) }}
     </div>
   </div>
 </ion-content>

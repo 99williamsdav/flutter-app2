@@ -37,17 +37,21 @@ app-home .swipe-viewport {
 
 app-home .swipe-track {
 	display: flex;
-	width: 200%;
-	transform: translateX(0%);
+	width: 300%;
+	transform: translateX(-33.333%);
 	transition: transform 220ms ease;
 }
 
 app-home .swipe-track.week-active {
-	transform: translateX(-50%);
+	transform: translateX(-66.667%);
+}
+
+app-home .swipe-track.stream-health-active {
+	transform: translateX(0%);
 }
 
 app-home .swipe-panel {
-	width: 50%;
+	width: 33.333%;
 }
 
 app-home .section-label {

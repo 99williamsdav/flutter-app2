@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { Subscription, interval } from 'rxjs';
+import { Subscription, forkJoin, interval } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
 import {
   IonHeader,
@@ -18,6 +17,7 @@ import {
   IonRefresherContent,
 } from '@ionic/angular/standalone';
 import { HourlyProfitPoint, ProfitService, ProfitData } from '../services/profit.service';
+import { StreamHealthData, StreamHealthService, StreamHealthSnapshot } from '../services/stream-health.service';
 import { FireworksComponent } from './fireworks.component';
 
 @Component({
@@ -43,7 +43,7 @@ import { FireworksComponent } from './fireworks.component';
   ],
 })
 export class HomePage implements OnInit, OnDestroy {
-  activeView: 'today' | 'week' = 'today';
+  activeView: 'today' | 'week' | 'streamHealth' = 'today';
   showFireworks = false;
   private fireworksShown = false;
   private touchStartX: number | null = null;
@@ -87,11 +87,16 @@ export class HomePage implements OnInit, OnDestroy {
   todayGrossBaselineY: number | null = null;
   weekGrossBaselineY: number | null = null;
 
+  streamHealthData: StreamHealthData = this.emptyStreamHealthData(15);
+  streamHealthHourData: StreamHealthData = this.emptyStreamHealthData(60);
+  streamHealthLastUpdated: Date | null = null;
+
   private pollSub?: Subscription;
+  private streamHealthSub?: Subscription;
 
   constructor(
     private profitService: ProfitService,
-    private router: Router,
+    private streamHealthService: StreamHealthService,
   ) {}
 
   get todayProfitLabel(): string {
@@ -121,10 +126,15 @@ export class HomePage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.startPolling();
+    this.streamHealthService.startPolling();
+    this.streamHealthSub = this.streamHealthService.snapshot$.subscribe(snapshot => {
+      if (snapshot) this.applyStreamHealthSnapshot(snapshot);
+    });
   }
 
   ngOnDestroy() {
     this.pollSub?.unsubscribe();
+    this.streamHealthSub?.unsubscribe();
   }
 
   private startPolling() {
@@ -147,8 +157,11 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   handleRefresh(event: any) {
-    this.profitService.fetchAll().subscribe(result => {
-      this.data = result;
+    forkJoin({
+      profit: this.profitService.fetchAll(),
+      streamHealth: this.streamHealthService.refresh(),
+    }).subscribe(({ profit }) => {
+      this.data = profit;
       this.rebuildGrossSparklines();
       event.target.complete();
     });
@@ -328,13 +341,35 @@ export class HomePage implements OnInit, OnDestroy {
 
     this.touchStartX = null;
 
-    if (swipeDelta < 0) {
-      this.activeView = 'week';
-    } else if (this.activeView === 'today') {
-      void this.router.navigateByUrl('/stream-health');
-    } else {
+    if (swipeDelta < 0 && this.activeView === 'streamHealth') {
       this.activeView = 'today';
+    } else if (swipeDelta < 0 && this.activeView === 'today') {
+      this.activeView = 'week';
+    } else if (swipeDelta > 0 && this.activeView === 'streamHealth') {
+      return;
+    } else if (swipeDelta > 0 && this.activeView === 'week') {
+      this.activeView = 'today';
+    } else if (swipeDelta > 0 && this.activeView === 'today') {
+      this.activeView = 'streamHealth';
     }
+  }
+
+  formatWholeRate(value: number | null): string {
+    return value === null ? '—' : Math.round(value).toLocaleString();
+  }
+
+  formatLatency(value: number | null): string {
+    if (value === null) return '—';
+    if (value >= 1000) return `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)} s`;
+    return `${Math.round(value)} ms`;
+  }
+
+  formatCount(value: number | null): string {
+    return value === null ? '—' : value.toLocaleString();
+  }
+
+  formatPercent(value: number | null): string {
+    return value === null ? '—' : `${value.toLocaleString(undefined, { maximumFractionDigits: 1 })}%`;
   }
 
   formatCurrency(value: number | null, includePositiveSign = false): string {
@@ -358,6 +393,27 @@ export class HomePage implements OnInit, OnDestroy {
     const hh = String(date.getHours()).padStart(2, '0');
     const mm = String(date.getMinutes()).padStart(2, '0');
     return `${hh}:${mm}`;
+  }
+
+  private emptyStreamHealthData(windowMinutes: number): StreamHealthData {
+    return {
+      updatesPerMinute: null,
+      analysesPerMinute: null,
+      analysesPerMcmPercent: null,
+      analysisLatencyMs: null,
+      floatBetsPlaced: null,
+      betsImmediatelyFullyMatched: null,
+      betsImmediatelyPartiallyMatched: null,
+      betsImmediatelyUnmatched: null,
+      windowMinutes,
+      unavailable: false,
+    };
+  }
+
+  private applyStreamHealthSnapshot(snapshot: StreamHealthSnapshot): void {
+    this.streamHealthData = snapshot.quarterHour;
+    this.streamHealthHourData = snapshot.hour;
+    this.streamHealthLastUpdated = snapshot.updatedAt;
   }
 
   get grossTotal(): number | null {

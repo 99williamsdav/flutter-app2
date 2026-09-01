@@ -132,6 +132,91 @@ ion-card {
   padding: 10px 6px;
 }
 
+.stream-health-panel {
+  box-sizing: border-box;
+  order: -1;
+  padding-left: 16px;
+}
+
+.stream-health-panel > h2,
+.health-section h3 {
+  color: var(--text-title);
+}
+
+.stream-health-panel > h2 {
+  margin: 0 0 18px;
+  font-size: 1.35rem;
+}
+
+.health-section {
+  margin-bottom: 28px;
+}
+
+.health-section h3 {
+  margin: 0 0 10px 4px;
+  font-size: 1rem;
+}
+
+.stream-health-card {
+  margin-bottom: 16px;
+}
+
+.health-heading,
+.health-metrics {
+  display: flex;
+  align-items: center;
+}
+
+.health-heading {
+  justify-content: space-between;
+  margin-bottom: 18px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.health-metric {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0 12px;
+  border-left: 1px solid var(--card-border);
+}
+
+.health-metric:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.health-metric span {
+  color: var(--text-title);
+  font-size: clamp(1.1rem, 4vw, 1.45rem);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.health-metric small {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.25;
+}
+
+@media (max-width: 390px) {
+  .health-metric {
+    padding: 0 8px;
+  }
+
+  .health-metric span {
+    font-size: 1rem;
+  }
+
+  .health-metric small {
+    font-size: 0.68rem;
+  }
+}
+
 @media (min-width: 700px) {
   .strategy-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
