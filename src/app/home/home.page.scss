@@ -20,6 +20,7 @@ ion-content.faded {
 .home-shell {
   max-width: 960px;
   margin: 0 auto;
+  padding-top: calc(16px + var(--ion-safe-area-top, 0px));
   padding-bottom: 20px;
 }
 
@@ -33,7 +34,7 @@ ion-card {
 }
 
 .hero-card {
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   border: none;
 
   &.gross-positive {
@@ -83,9 +84,9 @@ ion-card {
 
 .strategy-grid {
   display: grid;
-  gap: 14px;
+  gap: 8px;
   grid-template-columns: 1fr;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .strategy-card ion-card-header,
@@ -130,6 +131,25 @@ ion-card {
   text-align: center;
   color: var(--text-muted);
   padding: 10px 6px;
+}
+
+.hero-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+
+  .section-label {
+    margin-bottom: 8px;
+  }
+}
+
+.gross-commission {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .stream-health-panel {

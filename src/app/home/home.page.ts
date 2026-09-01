@@ -3,12 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Subscription, forkJoin, interval } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
   IonContent,
-  IonButtons,
-  IonMenuButton,
   IonCard,
   IonCardHeader,
   IonCardTitle,
@@ -27,12 +22,7 @@ import { FireworksComponent } from './fireworks.component';
   standalone: true,
   imports: [
     CommonModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
-    IonButtons,
-    IonMenuButton,
     IonCard,
     IonCardHeader,
     IonCardTitle,
@@ -366,6 +356,25 @@ export class HomePage implements OnInit, OnDestroy {
 
   formatCount(value: number | null): string {
     return value === null ? '—' : value.toLocaleString();
+  }
+
+  get immediateFillTotal(): number | null {
+    return this.immediateFillTotalFor(this.streamHealthHourData);
+  }
+
+  immediateFillTotalFor(data: StreamHealthData): number | null {
+    const full = data.betsImmediatelyFullyMatched;
+    const partial = data.betsImmediatelyPartiallyMatched;
+    const empty = data.betsImmediatelyUnmatched;
+
+    if (full === null || partial === null || empty === null) return null;
+    return full + partial + empty;
+  }
+
+  immediateFillShare(data: StreamHealthData, value: number | null): number | null {
+    const total = this.immediateFillTotalFor(data);
+    if (value === null || total === null) return null;
+    return total === 0 ? 0 : (value / total) * 100;
   }
 
   formatPercent(value: number | null): string {

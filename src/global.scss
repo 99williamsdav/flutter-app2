@@ -128,3 +128,131 @@ app-home .metric-value.positive {
 app-home .metric-value.negative {
 	color: #be123c;
 }
+
+app-home .today-health-card {
+	margin-bottom: 8px;
+}
+
+app-home .today-health-card ion-card-content {
+	padding: 14px 16px;
+}
+
+app-home .today-health-heading,
+app-home .bet-fill-heading {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	color: #667085;
+	font-size: 0.75rem;
+}
+
+app-home .today-health-heading {
+	margin-bottom: 12px;
+}
+
+app-home .today-health-heading span:first-child {
+	color: #243042;
+	font-weight: 700;
+}
+
+app-home .today-health-metrics {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	margin-bottom: 14px;
+}
+
+app-home .today-health-metric {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+app-home .today-health-metric + .today-health-metric {
+	padding-left: 10px;
+	border-left: 1px solid rgba(71, 84, 103, 0.12);
+}
+
+app-home .today-health-metric span {
+	color: #243042;
+	font-size: clamp(1.05rem, 4vw, 1.35rem);
+	font-weight: 700;
+	line-height: 1.2;
+}
+
+app-home .today-health-metric small,
+app-home .bet-fill-label {
+	color: #667085;
+}
+
+app-home .today-health-metric small {
+	font-size: 0.75rem;
+}
+
+app-home .bet-fill-heading {
+	margin-bottom: 7px;
+}
+
+app-home .stream-bet-floats {
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+	margin-bottom: 12px;
+}
+
+app-home .stream-bet-floats span {
+	color: #243042;
+	font-size: 1.1rem;
+	font-weight: 700;
+}
+
+app-home .stream-bet-floats small {
+	color: #667085;
+	font-size: 0.75rem;
+}
+
+app-home .bet-fill-bar {
+	display: flex;
+	height: 14px;
+	overflow: hidden;
+	border-radius: 5px;
+	background: rgba(71, 84, 103, 0.12);
+}
+
+app-home .bet-fill-bar > span {
+	display: block;
+	min-width: 0;
+}
+
+app-home .bet-fill-full {
+	background: #16a34a;
+}
+
+app-home .bet-fill-partial {
+	background: #d97706;
+}
+
+app-home .bet-fill-empty {
+	background: #be123c;
+}
+
+app-home .bet-fill-labels {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	margin-top: 7px;
+}
+
+app-home .bet-fill-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 0.7rem;
+	white-space: nowrap;
+}
+
+app-home .bet-fill-swatch {
+	width: 6px;
+	height: 6px;
+	border-radius: 2px;
+}
