@@ -149,6 +149,20 @@
                 <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-partial"></i>Partial {{ formatPercent(immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyPartiallyMatched)) }}</span>
                 <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-empty"></i>Empty {{ formatPercent(immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyUnmatched)) }}</span>
               </div>
+              <div class="today-fill-quality-metrics health-metrics" aria-label="Bet fill quality">
+                <div class="today-fill-quality-metric health-metric">
+                  <span>{{ formatPercent(streamHealthThreeHourData.fillableStakeMatchedPercent) }}</span>
+                  <small>Available size filled</small>
+                </div>
+                <div class="today-fill-quality-metric health-metric">
+                  <span>{{ formatPercent(streamHealthThreeHourData.averageBetFillPercent) }}</span>
+                  <small>Normalised</small>
+                </div>
+                <div class="today-fill-quality-metric health-metric">
+                  <span>{{ formatPercent(streamHealthThreeHourData.targetAvailablePercent) }}</span>
+                  <small>Target available</small>
+                </div>
+              </div>
             </ion-card-content>
           </ion-card>
         </section>

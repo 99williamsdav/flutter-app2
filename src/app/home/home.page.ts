@@ -415,6 +415,9 @@ export class HomePage implements OnInit, OnDestroy {
       betsImmediatelyFullyMatched: null,
       betsImmediatelyPartiallyMatched: null,
       betsImmediatelyUnmatched: null,
+      fillableStakeMatchedPercent: null,
+      averageBetFillPercent: null,
+      targetAvailablePercent: null,
       windowMinutes,
       unavailable: false,
     };

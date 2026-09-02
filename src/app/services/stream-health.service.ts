@@ -13,6 +13,9 @@ export interface StreamHealthData {
   betsImmediatelyFullyMatched: number | null;
   betsImmediatelyPartiallyMatched: number | null;
   betsImmediatelyUnmatched: number | null;
+  fillableStakeMatchedPercent: number | null;
+  averageBetFillPercent: number | null;
+  targetAvailablePercent: number | null;
   windowMinutes: number;
   unavailable: boolean;
 }
@@ -63,6 +66,11 @@ export class StreamHealthService {
         const summary = this.objectFrom(payload, 'summary');
         const receivedCount = this.numberFrom(summary, ['receivedCount']);
         const analysisCount = this.numberFrom(summary, ['analysisCount']);
+        const immediateFillRequestedStake = this.numberFrom(summary, ['immediateFillRequestedStake']);
+        const immediateFillFillableStake = this.numberFrom(summary, ['immediateFillFillableStake']);
+        const immediateFillMatchedStake = this.numberFrom(summary, ['immediateFillMatchedStake']);
+        const immediateFillMeasuredBetCount = this.numberFrom(summary, ['immediateFillMeasuredBetCount']);
+        const immediateFillRatioTotal = this.numberFrom(summary, ['immediateFillRatioTotal']);
 
         return {
           updatesPerMinute: this.numberFrom(summary, [
@@ -90,6 +98,9 @@ export class StreamHealthService {
           betsImmediatelyFullyMatched: this.numberFrom(summary, ['betsImmediatelyFullyMatched']),
           betsImmediatelyPartiallyMatched: this.numberFrom(summary, ['betsImmediatelyPartiallyMatched']),
           betsImmediatelyUnmatched: this.numberFrom(summary, ['betsImmediatelyUnmatched']),
+          fillableStakeMatchedPercent: this.percentage(immediateFillMatchedStake, immediateFillFillableStake),
+          averageBetFillPercent: this.percentage(immediateFillRatioTotal, immediateFillMeasuredBetCount),
+          targetAvailablePercent: this.percentage(immediateFillFillableStake, immediateFillRequestedStake),
           windowMinutes: this.numberFrom(payload, ['windowMinutes', 'minutes']) ?? minutes,
           unavailable: false,
         };
@@ -103,6 +114,9 @@ export class StreamHealthService {
         betsImmediatelyFullyMatched: null,
         betsImmediatelyPartiallyMatched: null,
         betsImmediatelyUnmatched: null,
+        fillableStakeMatchedPercent: null,
+        averageBetFillPercent: null,
+        targetAvailablePercent: null,
         windowMinutes: minutes,
         unavailable: true,
       }))
@@ -129,5 +143,11 @@ export class StreamHealthService {
     return value !== null && typeof value === 'object' && !Array.isArray(value)
       ? value as Record<string, unknown>
       : {};
+  }
+
+  private percentage(numerator: number | null, denominator: number | null): number | null {
+    return numerator !== null && denominator !== null && denominator > 0
+      ? (numerator / denominator) * 100
+      : null;
   }
 }
