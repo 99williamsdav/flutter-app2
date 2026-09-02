@@ -255,3 +255,7 @@ ion-card:not(.hero-card) {
     border-left: 1px solid var(--card-border);
   }
 }
+
+.health-metric.analysis-rate {
+  flex: 1.45;
+}

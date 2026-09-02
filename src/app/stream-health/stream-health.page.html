@@ -27,17 +27,13 @@
             <span class="metric-value">{{ formatWholeRate(data.updatesPerMinute) }}</span>
             <span class="metric-label">updates / min</span>
           </div>
-          <div class="metric">
-            <span class="metric-value">{{ formatWholeRate(data.analysesPerMinute) }}</span>
-            <span class="metric-label">/ min</span>
+          <div class="metric analysis-rate">
+            <span class="metric-value">{{ formatWholeRate(data.analysesPerMinute) }} ({{ formatPercent(data.analysesPerMcmPercent) }})</span>
+            <span class="metric-label">analyses / min</span>
           </div>
           <div class="metric">
             <span class="metric-value">{{ formatLatency(data.analysisLatencyMs) }}</span>
-            <span class="metric-label">latency</span>
-          </div>
-          <div class="metric">
-            <span class="metric-value">{{ formatPercent(data.analysesPerMcmPercent) }}</span>
-            <span class="metric-label">/ MCM</span>
+            <span class="metric-label">avg latency</span>
           </div>
         </div>
 
@@ -56,17 +52,13 @@
             <span class="metric-value">{{ formatWholeRate(hourData.updatesPerMinute) }}</span>
             <span class="metric-label">updates / min</span>
           </div>
-          <div class="metric">
-            <span class="metric-value">{{ formatWholeRate(hourData.analysesPerMinute) }}</span>
-            <span class="metric-label">/ min</span>
+          <div class="metric analysis-rate">
+            <span class="metric-value">{{ formatWholeRate(hourData.analysesPerMinute) }} ({{ formatPercent(hourData.analysesPerMcmPercent) }})</span>
+            <span class="metric-label">analyses / min</span>
           </div>
           <div class="metric">
             <span class="metric-value">{{ formatLatency(hourData.analysisLatencyMs) }}</span>
-            <span class="metric-label">latency</span>
-          </div>
-          <div class="metric">
-            <span class="metric-value">{{ formatPercent(hourData.analysesPerMcmPercent) }}</span>
-            <span class="metric-label">/ MCM</span>
+            <span class="metric-label">avg latency</span>
           </div>
         </div>
       </ion-card-content>

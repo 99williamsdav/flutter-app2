@@ -68,6 +68,10 @@ ion-content {
   border-left: 0;
 }
 
+.metric.analysis-rate {
+  flex: 1.45;
+}
+
 .metric-value {
   color: #243042;
   font-size: clamp(1.1rem, 4vw, 1.45rem);

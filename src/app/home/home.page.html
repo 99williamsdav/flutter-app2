@@ -121,13 +121,13 @@
                   <span>{{ formatWholeRate(streamHealthData.updatesPerMinute) }}</span>
                   <small>MCMs / min</small>
                 </div>
-                <div class="today-health-metric">
-                  <span>{{ formatWholeRate(streamHealthData.analysesPerMinute) }}</span>
+                <div class="today-health-metric analysis-rate">
+                  <span>{{ formatWholeRate(streamHealthData.analysesPerMinute) }} ({{ formatPercent(streamHealthData.analysesPerMcmPercent) }})</span>
                   <small>analyses / min</small>
                 </div>
                 <div class="today-health-metric">
-                  <span>{{ formatPercent(streamHealthData.analysesPerMcmPercent) }}</span>
-                  <small>analyses / MCM</small>
+                  <span>{{ formatLatency(streamHealthData.analysisLatencyMs) }}</span>
+                  <small>avg latency</small>
                 </div>
               </div>
 
@@ -241,9 +241,8 @@
                 <div class="health-heading"><div>Last {{ streamHealthData.windowMinutes }} minutes</div><div>{{ formatTime(streamHealthLastUpdated) }}</div></div>
                 <div class="health-metrics">
                   <div class="health-metric"><span>{{ formatWholeRate(streamHealthData.updatesPerMinute) }}</span><small>updates / min</small></div>
-                  <div class="health-metric"><span>{{ formatWholeRate(streamHealthData.analysesPerMinute) }}</span><small>/ min</small></div>
-                  <div class="health-metric"><span>{{ formatLatency(streamHealthData.analysisLatencyMs) }}</span><small>latency</small></div>
-                  <div class="health-metric"><span>{{ formatPercent(streamHealthData.analysesPerMcmPercent) }}</span><small>/ MCM</small></div>
+                  <div class="health-metric analysis-rate"><span>{{ formatWholeRate(streamHealthData.analysesPerMinute) }} ({{ formatPercent(streamHealthData.analysesPerMcmPercent) }})</span><small>analyses / min</small></div>
+                  <div class="health-metric"><span>{{ formatLatency(streamHealthData.analysisLatencyMs) }}</span><small>avg latency</small></div>
                 </div>
               </ion-card-content>
             </ion-card>
@@ -252,9 +251,8 @@
                 <div class="health-heading"><div>Last {{ streamHealthHourData.windowMinutes / 60 }} hour</div><div>{{ formatTime(streamHealthLastUpdated) }}</div></div>
                 <div class="health-metrics">
                   <div class="health-metric"><span>{{ formatWholeRate(streamHealthHourData.updatesPerMinute) }}</span><small>updates / min</small></div>
-                  <div class="health-metric"><span>{{ formatWholeRate(streamHealthHourData.analysesPerMinute) }}</span><small>/ min</small></div>
-                  <div class="health-metric"><span>{{ formatLatency(streamHealthHourData.analysisLatencyMs) }}</span><small>latency</small></div>
-                  <div class="health-metric"><span>{{ formatPercent(streamHealthHourData.analysesPerMcmPercent) }}</span><small>/ MCM</small></div>
+                  <div class="health-metric analysis-rate"><span>{{ formatWholeRate(streamHealthHourData.analysesPerMinute) }} ({{ formatPercent(streamHealthHourData.analysesPerMcmPercent) }})</span><small>analyses / min</small></div>
+                  <div class="health-metric"><span>{{ formatLatency(streamHealthHourData.analysisLatencyMs) }}</span><small>avg latency</small></div>
                 </div>
               </ion-card-content>
             </ion-card>
