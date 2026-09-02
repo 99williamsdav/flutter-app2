@@ -12,11 +12,12 @@ ion-content {
 }
 
 .health-card {
-  margin: 0 0 16px;
-  border: 1px solid rgba(71, 84, 103, 0.12);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 12px 28px rgba(16, 24, 40, 0.08);
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(71, 84, 103, 0.16);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .health-section {

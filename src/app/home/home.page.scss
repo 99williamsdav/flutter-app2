@@ -33,6 +33,15 @@ ion-card {
   backdrop-filter: blur(4px);
 }
 
+ion-card:not(.hero-card) {
+  border: 0;
+  border-bottom: 1px solid var(--card-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
 .hero-card {
   margin-bottom: 8px;
   border: none;
@@ -84,7 +93,7 @@ ion-card {
 
 .strategy-grid {
   display: grid;
-  gap: 8px;
+  gap: 0;
   grid-template-columns: 1fr;
   margin-bottom: 8px;
 }
@@ -178,7 +187,7 @@ ion-card {
 }
 
 .stream-health-card {
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 
 .health-heading,
@@ -240,5 +249,9 @@ ion-card {
 @media (min-width: 700px) {
   .strategy-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .strategy-card + .strategy-card {
+    border-left: 1px solid var(--card-border);
   }
 }
