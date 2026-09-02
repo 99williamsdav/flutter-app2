@@ -79,6 +79,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   streamHealthData: StreamHealthData = this.emptyStreamHealthData(15);
   streamHealthHourData: StreamHealthData = this.emptyStreamHealthData(60);
+  streamHealthThreeHourData: StreamHealthData = this.emptyStreamHealthData(180);
   streamHealthLastUpdated: Date | null = null;
 
   private pollSub?: Subscription;
@@ -359,7 +360,7 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   get immediateFillTotal(): number | null {
-    return this.immediateFillTotalFor(this.streamHealthHourData);
+    return this.immediateFillTotalFor(this.streamHealthThreeHourData);
   }
 
   immediateFillTotalFor(data: StreamHealthData): number | null {
@@ -422,6 +423,7 @@ export class HomePage implements OnInit, OnDestroy {
   private applyStreamHealthSnapshot(snapshot: StreamHealthSnapshot): void {
     this.streamHealthData = snapshot.quarterHour;
     this.streamHealthHourData = snapshot.hour;
+    this.streamHealthThreeHourData = snapshot.threeHours;
     this.streamHealthLastUpdated = snapshot.updatedAt;
   }
 

@@ -20,6 +20,7 @@ export interface StreamHealthData {
 export interface StreamHealthSnapshot {
   quarterHour: StreamHealthData;
   hour: StreamHealthData;
+  threeHours: StreamHealthData;
   updatedAt: Date;
 }
 
@@ -44,6 +45,7 @@ export class StreamHealthService {
     return forkJoin({
       quarterHour: this.fetch(15),
       hour: this.fetch(60),
+      threeHours: this.fetch(180),
     }).pipe(
       map(metrics => ({ ...metrics, updatedAt: new Date() })),
       map(snapshot => {

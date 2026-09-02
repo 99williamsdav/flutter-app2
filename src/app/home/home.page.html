@@ -133,21 +133,21 @@
 
               <div class="bet-fill-heading">
                 <span>Non-float immediate fill</span>
-                <span>Last hour · {{ immediateFillTotal === null ? '—' : formatCount(immediateFillTotal) + ' bets' }}</span>
+                <span>Last 3 hours · {{ immediateFillTotal === null ? '—' : formatCount(immediateFillTotal) + ' bets' }}</span>
               </div>
               <div
                 class="bet-fill-bar"
                 role="img"
-                [attr.aria-label]="'Immediate fill in the last hour: ' + formatPercent(immediateFillShare(streamHealthHourData, streamHealthHourData.betsImmediatelyFullyMatched)) + ' full, ' + formatPercent(immediateFillShare(streamHealthHourData, streamHealthHourData.betsImmediatelyPartiallyMatched)) + ' partial, ' + formatPercent(immediateFillShare(streamHealthHourData, streamHealthHourData.betsImmediatelyUnmatched)) + ' empty'"
+                [attr.aria-label]="'Immediate fill in the last 3 hours: ' + formatPercent(immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyFullyMatched)) + ' full, ' + formatPercent(immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyPartiallyMatched)) + ' partial, ' + formatPercent(immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyUnmatched)) + ' empty'"
               >
-                <span class="bet-fill-full" [style.width.%]="immediateFillShare(streamHealthHourData, streamHealthHourData.betsImmediatelyFullyMatched) ?? 0"></span>
-                <span class="bet-fill-partial" [style.width.%]="immediateFillShare(streamHealthHourData, streamHealthHourData.betsImmediatelyPartiallyMatched) ?? 0"></span>
-                <span class="bet-fill-empty" [style.width.%]="immediateFillShare(streamHealthHourData, streamHealthHourData.betsImmediatelyUnmatched) ?? 0"></span>
+                <span class="bet-fill-full" [style.width.%]="immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyFullyMatched) ?? 0"></span>
+                <span class="bet-fill-partial" [style.width.%]="immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyPartiallyMatched) ?? 0"></span>
+                <span class="bet-fill-empty" [style.width.%]="immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyUnmatched) ?? 0"></span>
               </div>
               <div class="bet-fill-labels">
-                <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-full"></i>Full {{ formatPercent(immediateFillShare(streamHealthHourData, streamHealthHourData.betsImmediatelyFullyMatched)) }}</span>
-                <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-partial"></i>Partial {{ formatPercent(immediateFillShare(streamHealthHourData, streamHealthHourData.betsImmediatelyPartiallyMatched)) }}</span>
-                <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-empty"></i>Empty {{ formatPercent(immediateFillShare(streamHealthHourData, streamHealthHourData.betsImmediatelyUnmatched)) }}</span>
+                <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-full"></i>Full {{ formatPercent(immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyFullyMatched)) }}</span>
+                <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-partial"></i>Partial {{ formatPercent(immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyPartiallyMatched)) }}</span>
+                <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-empty"></i>Empty {{ formatPercent(immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyUnmatched)) }}</span>
               </div>
             </ion-card-content>
           </ion-card>
