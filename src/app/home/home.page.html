@@ -36,16 +36,16 @@
 
           <div class="strategy-grid">
             <ion-card class="strategy-card">
-              <ion-card-header>
-                <ion-card-title>Normal</ion-card-title>
-              </ion-card-header>
               <ion-card-content>
-                <div class="metric-row">
-                  <div class="metric-value main" [class.negative]="data.normalProfit !== null && data.normalProfit < 0" [class.positive]="data.normalProfit !== null && data.normalProfit > 0">
-                    {{ formatCurrency(data.normalProfit) }}
-                  </div>
-                  <div class="metric-value side" [class.negative]="data.normalCashout !== null && data.normalCashout < 0" [class.positive]="data.normalCashout !== null && data.normalCashout > 0">
-                    ({{ formatCurrency(data.normalCashout, true) }})
+                <div class="strategy-metric-row">
+                  <ion-card-title>Normal</ion-card-title>
+                  <div class="strategy-metric-values">
+                    <div class="metric-value main" [class.negative]="data.normalProfit !== null && data.normalProfit < 0" [class.positive]="data.normalProfit !== null && data.normalProfit > 0">
+                      {{ formatCurrency(data.normalProfit) }}
+                    </div>
+                    <div class="metric-value side" [class.negative]="data.normalCashout !== null && data.normalCashout < 0" [class.positive]="data.normalCashout !== null && data.normalCashout > 0">
+                      ({{ formatCurrency(data.normalCashout, true) }})
+                    </div>
                   </div>
                 </div>
                 <div class="stale-indicator" *ngIf="data.normalStale">Data stale !</div>
@@ -53,16 +53,16 @@
             </ion-card>
 
             <ion-card class="strategy-card">
-              <ion-card-header>
-                <ion-card-title>InPlay</ion-card-title>
-              </ion-card-header>
               <ion-card-content>
-                <div class="metric-row">
-                  <div class="metric-value main" [class.negative]="data.inplayProfit !== null && data.inplayProfit < 0" [class.positive]="data.inplayProfit !== null && data.inplayProfit > 0">
-                    {{ formatCurrency(data.inplayProfit) }}
-                  </div>
-                  <div class="metric-value side" [class.negative]="data.inplayExpected !== null && data.inplayExpected < 0" [class.positive]="data.inplayExpected !== null && data.inplayExpected > 0">
-                    ({{ formatCurrency(data.inplayExpected, true) }})
+                <div class="strategy-metric-row">
+                  <ion-card-title>InPlay</ion-card-title>
+                  <div class="strategy-metric-values">
+                    <div class="metric-value main" [class.negative]="data.inplayProfit !== null && data.inplayProfit < 0" [class.positive]="data.inplayProfit !== null && data.inplayProfit > 0">
+                      {{ formatCurrency(data.inplayProfit) }}
+                    </div>
+                    <div class="metric-value side" [class.negative]="data.inplayExpected !== null && data.inplayExpected < 0" [class.positive]="data.inplayExpected !== null && data.inplayExpected > 0">
+                      ({{ formatCurrency(data.inplayExpected, true) }})
+                    </div>
                   </div>
                 </div>
                 <div class="stale-indicator" *ngIf="data.inplayStale">Data stale !</div>
@@ -70,16 +70,16 @@
             </ion-card>
 
             <ion-card class="strategy-card">
-              <ion-card-header>
-                <ion-card-title>Snowball</ion-card-title>
-              </ion-card-header>
               <ion-card-content>
-                <div class="metric-row">
-                  <div class="metric-value main" [class.negative]="data.snowballProfit !== null && data.snowballProfit < 0" [class.positive]="data.snowballProfit !== null && data.snowballProfit > 0">
-                    {{ formatCurrency(data.snowballProfit) }}
-                  </div>
-                  <div class="metric-value side" [class.negative]="data.snowballCashout !== null && data.snowballCashout < 0" [class.positive]="data.snowballCashout !== null && data.snowballCashout > 0">
-                    ({{ formatCurrency(data.snowballCashout, true) }})
+                <div class="strategy-metric-row">
+                  <ion-card-title>Snowball</ion-card-title>
+                  <div class="strategy-metric-values">
+                    <div class="metric-value main" [class.negative]="data.snowballProfit !== null && data.snowballProfit < 0" [class.positive]="data.snowballProfit !== null && data.snowballProfit > 0">
+                      {{ formatCurrency(data.snowballProfit) }}
+                    </div>
+                    <div class="metric-value side" [class.negative]="data.snowballCashout !== null && data.snowballCashout < 0" [class.positive]="data.snowballCashout !== null && data.snowballCashout > 0">
+                      ({{ formatCurrency(data.snowballCashout, true) }})
+                    </div>
                   </div>
                 </div>
                 <div class="stale-indicator" *ngIf="data.snowballStale">Data stale !</div>
@@ -179,7 +179,7 @@
           </ion-card>
 
           <div class="strategy-grid">
-            <ion-card class="strategy-card">
+            <ion-card class="strategy-card weekly-strategy-card">
               <ion-card-header>
                 <ion-card-title>Normal</ion-card-title>
               </ion-card-header>
@@ -196,7 +196,7 @@
               </ion-card-content>
             </ion-card>
 
-            <ion-card class="strategy-card">
+            <ion-card class="strategy-card weekly-strategy-card">
               <ion-card-header>
                 <ion-card-title>InPlay</ion-card-title>
               </ion-card-header>
@@ -213,7 +213,7 @@
               </ion-card-content>
             </ion-card>
 
-            <ion-card class="strategy-card">
+            <ion-card class="strategy-card weekly-strategy-card">
               <ion-card-header>
                 <ion-card-title>Snowball</ion-card-title>
               </ion-card-header>

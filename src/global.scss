@@ -256,3 +256,50 @@ app-home .bet-fill-swatch {
 	height: 6px;
 	border-radius: 2px;
 }
+
+app-home .strategy-metric-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 6.25rem 4.75rem;
+	align-items: flex-end;
+	gap: 8px;
+}
+
+app-home .strategy-card ion-card-content {
+	padding-inline: 16px;
+}
+
+app-home .weekly-strategy-card ion-card-content {
+	padding-inline: 20px;
+}
+
+app-home .strategy-metric-row ion-card-title {
+	padding-bottom: 4px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+app-home .strategy-metric-values {
+	display: contents;
+}
+
+app-home .strategy-metric-values .metric-value {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+app-home .strategy-metric-values .metric-value.side {
+	align-self: end;
+	padding-bottom: 0;
+	line-height: 1;
+}
+
+app-home .strategy-metric-values .metric-value.main {
+	justify-self: stretch;
+	text-align: left;
+	font-size: clamp(1.55rem, 6vw, 2.05rem);
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	line-height: 1;
+}
