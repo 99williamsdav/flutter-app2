@@ -69,6 +69,7 @@ export interface ProfitData {
   upcomingGBRaces: number;
   totalGBRaces: number;
   upcomingGBVenues: number;
+  totalGBVenues: number;
   lastUpdated: Date | null;
 }
 
@@ -283,7 +284,12 @@ export class ProfitService {
     );
   }
 
-  private fetchUpcomingRaces(): Observable<{ upcomingGBRaces: number; totalGBRaces: number; upcomingGBVenues: number }> {
+  private fetchUpcomingRaces(): Observable<{
+    upcomingGBRaces: number;
+    totalGBRaces: number;
+    upcomingGBVenues: number;
+    totalGBVenues: number;
+  }> {
     const now = new Date();
     const ukToday = this.getUkDateParts(now);
     const nextUkDay = new Date(Date.UTC(ukToday.year, ukToday.month - 1, ukToday.day + 1));
@@ -302,24 +308,27 @@ export class ProfitService {
     return this.http.get<RaceData[]>(url).pipe(
       map(races => {
         if (!races || !Array.isArray(races)) {
-          return { upcomingGBRaces: 0, totalGBRaces: 0, upcomingGBVenues: 0 };
+          return { upcomingGBRaces: 0, totalGBRaces: 0, upcomingGBVenues: 0, totalGBVenues: 0 };
         }
 
         const gbRaces = races.filter(race => race.Country === 'GB');
         const upcomingGBRaces = gbRaces.filter(race => race.Status === 'Open');
-        const distinctVenues = new Set(
-          upcomingGBRaces
+        const getDistinctVenueCount = (raceRows: RaceData[]) => new Set(
+          raceRows
             .map(race => race.Venue?.trim())
             .filter((venue): venue is string => Boolean(venue))
-        );
+        ).size;
+        const upcomingGBVenues = getDistinctVenueCount(upcomingGBRaces);
+        const totalGBVenues = getDistinctVenueCount(gbRaces);
 
         return {
           upcomingGBRaces: upcomingGBRaces.length,
           totalGBRaces: gbRaces.length,
-          upcomingGBVenues: distinctVenues.size,
+          upcomingGBVenues,
+          totalGBVenues,
         };
       }),
-      catchError(() => of({ upcomingGBRaces: 0, totalGBRaces: 0, upcomingGBVenues: 0 }))
+      catchError(() => of({ upcomingGBRaces: 0, totalGBRaces: 0, upcomingGBVenues: 0, totalGBVenues: 0 }))
     );
   }
 
@@ -435,6 +444,7 @@ export class ProfitService {
         upcomingGBRaces: upcomingRaces.upcomingGBRaces,
         totalGBRaces: upcomingRaces.totalGBRaces,
         upcomingGBVenues: upcomingRaces.upcomingGBVenues,
+        totalGBVenues: upcomingRaces.totalGBVenues,
         lastUpdated: new Date(),
       }))
     );

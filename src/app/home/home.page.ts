@@ -68,6 +68,7 @@ export class HomePage implements OnInit, OnDestroy {
     upcomingGBRaces: 0,
     totalGBRaces: 0,
     upcomingGBVenues: 0,
+    totalGBVenues: 0,
     lastUpdated: null,
   };
 
