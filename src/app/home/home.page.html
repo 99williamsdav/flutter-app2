@@ -249,6 +249,65 @@
               </ion-card-content>
             </ion-card>
           </div>
+
+          <ion-card class="today-health-card" [class.unavailable]="streamHealthWeekData.unavailable">
+            <ion-card-content>
+              <div class="today-health-heading">
+                <span>Stream health</span>
+                <span>Last 7 days</span>
+              </div>
+              <div class="today-health-metrics health-metrics">
+                <div class="today-health-metric health-metric">
+                  <span>{{ formatWholeRate(streamHealthWeekData.updatesPerMinute) }}</span>
+                  <small>MCMs / min</small>
+                </div>
+                <div class="today-health-metric health-metric analysis-rate">
+                  <span>{{ formatWholeRate(streamHealthWeekData.analysesPerMinute) }} ({{ formatPercent(streamHealthWeekData.analysesPerMcmPercent) }})</span>
+                  <small>analyses / min</small>
+                </div>
+                <div class="today-health-metric health-metric">
+                  <span>{{ formatLatency(streamHealthWeekData.analysisLatencyMs) }}</span>
+                  <small>avg latency</small>
+                </div>
+              </div>
+
+              <div class="bet-fill-heading">
+                <span>Non-float immediate fill</span>
+                <span>Last 7 days · {{ immediateFillTotalFor(streamHealthWeekData) === null ? '—' : formatCount(immediateFillTotalFor(streamHealthWeekData)) + ' bets' }}</span>
+              </div>
+              <div
+                class="bet-fill-bar"
+                role="img"
+                [attr.aria-label]="'Immediate fill in the last 7 days: ' + formatPercent(immediateFillShare(streamHealthWeekData, streamHealthWeekData.betsImmediatelyFullyMatched)) + ' full, ' + formatPercent(immediateFillShare(streamHealthWeekData, streamHealthWeekData.betsImmediatelyPartiallyMatched)) + ' partial, ' + formatPercent(immediateFillShare(streamHealthWeekData, streamHealthWeekData.betsImmediatelyUnmatched)) + ' empty'"
+              >
+                <span class="bet-fill-full" [style.width.%]="immediateFillShare(streamHealthWeekData, streamHealthWeekData.betsImmediatelyFullyMatched) ?? 0"></span>
+                <span class="bet-fill-partial" [style.width.%]="immediateFillShare(streamHealthWeekData, streamHealthWeekData.betsImmediatelyPartiallyMatched) ?? 0"></span>
+                <span class="bet-fill-empty" [style.width.%]="immediateFillShare(streamHealthWeekData, streamHealthWeekData.betsImmediatelyUnmatched) ?? 0"></span>
+              </div>
+              <div class="bet-fill-labels">
+                <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-full"></i>Full {{ formatPercent(immediateFillShare(streamHealthWeekData, streamHealthWeekData.betsImmediatelyFullyMatched)) }}</span>
+                <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-partial"></i>Partial {{ formatPercent(immediateFillShare(streamHealthWeekData, streamHealthWeekData.betsImmediatelyPartiallyMatched)) }}</span>
+                <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-empty"></i>Empty {{ formatPercent(immediateFillShare(streamHealthWeekData, streamHealthWeekData.betsImmediatelyUnmatched)) }}</span>
+              </div>
+              <div class="today-fill-quality-metrics" aria-label="Weekly bet fill quality">
+                <div class="today-fill-quality-metric health-metric">
+                  <small>Available filled</small>
+                  <div class="fill-quality-bar"><i [style.width.%]="streamHealthWeekData.fillableStakeMatchedPercent ?? 0"></i></div>
+                  <span>{{ formatPercent(streamHealthWeekData.fillableStakeMatchedPercent) }}</span>
+                </div>
+                <div class="today-fill-quality-metric health-metric">
+                  <small>Normalised</small>
+                  <div class="fill-quality-bar"><i [style.width.%]="streamHealthWeekData.averageBetFillPercent ?? 0"></i></div>
+                  <span>{{ formatPercent(streamHealthWeekData.averageBetFillPercent) }}</span>
+                </div>
+                <div class="today-fill-quality-metric health-metric">
+                  <small>Target available</small>
+                  <div class="fill-quality-bar"><i [style.width.%]="streamHealthWeekData.targetAvailablePercent ?? 0"></i></div>
+                  <span>{{ formatPercent(streamHealthWeekData.targetAvailablePercent) }}</span>
+                </div>
+              </div>
+            </ion-card-content>
+          </ion-card>
         </section>
         <section class="swipe-panel stream-health-panel" aria-label="Stream Health">
           <h2>Stream Health</h2>

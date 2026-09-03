@@ -98,9 +98,12 @@ ion-card:not(.hero-card) {
   margin-bottom: 8px;
 }
 
-.strategy-card ion-card-header,
-.open-stake-card ion-card-header {
+.strategy-card ion-card-header {
   padding-bottom: 6px;
+}
+
+.open-stake-card ion-card-header {
+  padding: 8px 16px 6px;
 }
 
 .stale-indicator {
