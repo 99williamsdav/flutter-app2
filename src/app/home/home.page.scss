@@ -261,7 +261,23 @@ ion-card:not(.hero-card) {
 }
 
 .today-fill-quality-metrics {
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid var(--card-border);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.today-fill-quality-metric {
+  padding: 10px;
+}
+
+.fill-quality-bar {
+  height: 5px;
+  overflow: hidden;
+  background: #e0e7e1;
+  border-radius: 999px;
+}
+
+.fill-quality-bar i {
+  display: block;
+  height: 100%;
+  background: #3c8b58;
 }

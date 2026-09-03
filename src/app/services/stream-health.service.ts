@@ -16,6 +16,10 @@ export interface StreamHealthData {
   fillableStakeMatchedPercent: number | null;
   averageBetFillPercent: number | null;
   targetAvailablePercent: number | null;
+  immediateFillRequestedStake: number | null;
+  immediateFillFillableStake: number | null;
+  immediateFillMatchedStake: number | null;
+  immediateFillMeasuredBetCount: number | null;
   windowMinutes: number;
   unavailable: boolean;
 }
@@ -101,6 +105,10 @@ export class StreamHealthService {
           fillableStakeMatchedPercent: this.percentage(immediateFillMatchedStake, immediateFillFillableStake),
           averageBetFillPercent: this.percentage(immediateFillRatioTotal, immediateFillMeasuredBetCount),
           targetAvailablePercent: this.percentage(immediateFillFillableStake, immediateFillRequestedStake),
+          immediateFillRequestedStake,
+          immediateFillFillableStake,
+          immediateFillMatchedStake,
+          immediateFillMeasuredBetCount,
           windowMinutes: this.numberFrom(payload, ['windowMinutes', 'minutes']) ?? minutes,
           unavailable: false,
         };
@@ -117,6 +125,10 @@ export class StreamHealthService {
         fillableStakeMatchedPercent: null,
         averageBetFillPercent: null,
         targetAvailablePercent: null,
+        immediateFillRequestedStake: null,
+        immediateFillFillableStake: null,
+        immediateFillMatchedStake: null,
+        immediateFillMeasuredBetCount: null,
         windowMinutes: minutes,
         unavailable: true,
       }))

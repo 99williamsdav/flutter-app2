@@ -48,6 +48,10 @@ export class StreamHealthPage implements OnInit, OnDestroy {
     fillableStakeMatchedPercent: null,
     averageBetFillPercent: null,
     targetAvailablePercent: null,
+    immediateFillRequestedStake: null,
+    immediateFillFillableStake: null,
+    immediateFillMatchedStake: null,
+    immediateFillMeasuredBetCount: null,
     windowMinutes: 15,
     unavailable: false,
   };
@@ -63,6 +67,10 @@ export class StreamHealthPage implements OnInit, OnDestroy {
     fillableStakeMatchedPercent: null,
     averageBetFillPercent: null,
     targetAvailablePercent: null,
+    immediateFillRequestedStake: null,
+    immediateFillFillableStake: null,
+    immediateFillMatchedStake: null,
+    immediateFillMeasuredBetCount: null,
     windowMinutes: 60,
     unavailable: false,
   };

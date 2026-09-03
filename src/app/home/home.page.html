@@ -149,18 +149,21 @@
                 <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-partial"></i>Partial {{ formatPercent(immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyPartiallyMatched)) }}</span>
                 <span class="bet-fill-label"><i class="bet-fill-swatch bet-fill-empty"></i>Empty {{ formatPercent(immediateFillShare(streamHealthThreeHourData, streamHealthThreeHourData.betsImmediatelyUnmatched)) }}</span>
               </div>
-              <div class="today-fill-quality-metrics health-metrics" aria-label="Bet fill quality">
+              <div class="today-fill-quality-metrics" aria-label="Bet fill quality">
                 <div class="today-fill-quality-metric health-metric">
+                  <small>Available filled</small>
+                  <div class="fill-quality-bar"><i [style.width.%]="streamHealthThreeHourData.fillableStakeMatchedPercent ?? 0"></i></div>
                   <span>{{ formatPercent(streamHealthThreeHourData.fillableStakeMatchedPercent) }}</span>
-                  <small>Available size filled</small>
                 </div>
                 <div class="today-fill-quality-metric health-metric">
-                  <span>{{ formatPercent(streamHealthThreeHourData.averageBetFillPercent) }}</span>
                   <small>Normalised</small>
+                  <div class="fill-quality-bar"><i [style.width.%]="streamHealthThreeHourData.averageBetFillPercent ?? 0"></i></div>
+                  <span>{{ formatPercent(streamHealthThreeHourData.averageBetFillPercent) }}</span>
                 </div>
                 <div class="today-fill-quality-metric health-metric">
-                  <span>{{ formatPercent(streamHealthThreeHourData.targetAvailablePercent) }}</span>
                   <small>Target available</small>
+                  <div class="fill-quality-bar"><i [style.width.%]="streamHealthThreeHourData.targetAvailablePercent ?? 0"></i></div>
+                  <span>{{ formatPercent(streamHealthThreeHourData.targetAvailablePercent) }}</span>
                 </div>
               </div>
             </ion-card-content>
@@ -176,7 +179,12 @@
             [class.gross-neutral]="grossWeekToDateTotal === 0 || grossWeekToDateTotal === null"
           >
             <ion-card-content>
-              <div class="section-label">This Week's Profit</div>
+              <div class="hero-heading">
+                <div class="section-label">This Week's Profit</div>
+                <div class="gross-commission">
+                  Commission: {{ formatCurrency(data.commissionPaidThisWeek) }}
+                </div>
+              </div>
               <div class="gross-value" [class.negative]="grossWeekToDateTotal !== null && grossWeekToDateTotal < 0" [class.positive]="grossWeekToDateTotal !== null && grossWeekToDateTotal > 0">
                 {{ formatCurrency(grossWeekToDateTotal) }}
               </div>
@@ -185,9 +193,6 @@
                   <path *ngIf="weekGrossBaselineY !== null" class="sparkline-baseline" [attr.d]="'M0 ' + weekGrossBaselineY + ' L100 ' + weekGrossBaselineY"></path>
                   <path *ngIf="weekGrossSparklinePath" class="sparkline-line" [attr.d]="weekGrossSparklinePath"></path>
                 </svg>
-              </div>
-              <div class="gross-subvalue">
-                Commission: {{ formatCurrency(data.commissionPaidThisWeek) }}
               </div>
             </ion-card-content>
           </ion-card>

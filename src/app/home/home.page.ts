@@ -418,6 +418,10 @@ export class HomePage implements OnInit, OnDestroy {
       fillableStakeMatchedPercent: null,
       averageBetFillPercent: null,
       targetAvailablePercent: null,
+      immediateFillRequestedStake: null,
+      immediateFillFillableStake: null,
+      immediateFillMatchedStake: null,
+      immediateFillMeasuredBetCount: null,
       windowMinutes,
       unavailable: false,
     };
