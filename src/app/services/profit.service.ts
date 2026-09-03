@@ -35,6 +35,7 @@ export interface RaceData {
   Date: Date | string;
   Venue: string;
   Country: string;
+  Status?: string;
   Commission: number | null;
 }
 
@@ -66,6 +67,7 @@ export interface ProfitData {
   commissionPaidToday: number | null;
   commissionPaidThisWeek: number | null;
   upcomingGBRaces: number;
+  totalGBRaces: number;
   upcomingGBVenues: number;
   lastUpdated: Date | null;
 }
@@ -281,7 +283,7 @@ export class ProfitService {
     );
   }
 
-  private fetchUpcomingRaces(): Observable<{ upcomingGBRaces: number; upcomingGBVenues: number }> {
+  private fetchUpcomingRaces(): Observable<{ upcomingGBRaces: number; totalGBRaces: number; upcomingGBVenues: number }> {
     const now = new Date();
     const ukToday = this.getUkDateParts(now);
     const nextUkDay = new Date(Date.UTC(ukToday.year, ukToday.month - 1, ukToday.day + 1));
@@ -291,7 +293,8 @@ export class ProfitService {
       day: nextUkDay.getUTCDate(),
     });
 
-    const dateFromString = this.formatUtcQueryParam(now);
+    const startOfUkDay = this.getUkMidnight(ukToday);
+    const dateFromString = this.formatUtcQueryParam(startOfUkDay);
     const dateToString = this.formatUtcQueryParam(endOfUkDay);
 
     const url = `${this.flutterbotBase}/races?df=${encodeURIComponent(dateFromString)}&dt=${encodeURIComponent(dateToString)}`;
@@ -299,22 +302,24 @@ export class ProfitService {
     return this.http.get<RaceData[]>(url).pipe(
       map(races => {
         if (!races || !Array.isArray(races)) {
-          return { upcomingGBRaces: 0, upcomingGBVenues: 0 };
+          return { upcomingGBRaces: 0, totalGBRaces: 0, upcomingGBVenues: 0 };
         }
 
         const gbRaces = races.filter(race => race.Country === 'GB');
+        const upcomingGBRaces = gbRaces.filter(race => race.Status === 'Open');
         const distinctVenues = new Set(
-          gbRaces
+          upcomingGBRaces
             .map(race => race.Venue?.trim())
             .filter((venue): venue is string => Boolean(venue))
         );
 
         return {
-          upcomingGBRaces: gbRaces.length,
+          upcomingGBRaces: upcomingGBRaces.length,
+          totalGBRaces: gbRaces.length,
           upcomingGBVenues: distinctVenues.size,
         };
       }),
-      catchError(() => of({ upcomingGBRaces: 0, upcomingGBVenues: 0 }))
+      catchError(() => of({ upcomingGBRaces: 0, totalGBRaces: 0, upcomingGBVenues: 0 }))
     );
   }
 
@@ -428,6 +433,7 @@ export class ProfitService {
         commissionPaidToday,
         commissionPaidThisWeek,
         upcomingGBRaces: upcomingRaces.upcomingGBRaces,
+        totalGBRaces: upcomingRaces.totalGBRaces,
         upcomingGBVenues: upcomingRaces.upcomingGBVenues,
         lastUpdated: new Date(),
       }))
