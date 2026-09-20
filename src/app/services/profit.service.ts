@@ -62,6 +62,7 @@ export interface ProfitData {
   inplayWeekToDateHourlyProfit: HourlyProfitPoint[];
   inplayStale: boolean;
   averageHourlyProfit: HourlyProfitPoint[];
+  weeklyAverageHourlyProfit: HourlyProfitPoint[];
   openStake: number | null;
   openAverageProfit: number | null;
   openLayValue: number | null;
@@ -298,6 +299,24 @@ export class ProfitService {
     );
   }
 
+  private fetchWeeklyAverageHourlyProfit(): Observable<HourlyProfitPoint[]> {
+    const url = `${this.flutterbotBase}/weeklyaverages?df=2018-10-29&dsFilters=${encodeURIComponent('{"InPlay":null}')}&specialFilters=${encodeURIComponent('{}')}`;
+
+    return this.http.get<any[]>(url).pipe(
+      map(rows => (Array.isArray(rows) ? rows : [])
+        .map(row => {
+          const bucket = typeof row?.Bucket === 'string' ? row.Bucket : null;
+          const profit = row?.NetProfit;
+          return bucket && !Number.isNaN(Date.parse(bucket)) && typeof profit === 'number'
+            ? { bucket, profit }
+            : null;
+        })
+        .filter((point): point is { bucket: string; profit: number } => point !== null)
+        .sort((a, b) => Date.parse(a.bucket) - Date.parse(b.bucket))),
+      catchError(() => of([]))
+    );
+  }
+
   private fetchOpenBets(): Observable<{ openStake: number | null; openAverageProfit: number | null; openLayValue: number | null }> {
     const url = `${this.flutterbotBase}/open`;
     return this.http.get<OpenPosition[]>(url).pipe(
@@ -448,12 +467,13 @@ export class ProfitService {
       snowball: this.fetchStats(this.snowballBase, '', today, today),
       inplay: this.fetchStats(this.flutterbotBase, 'InPlay: true, ', today, today),
       averageHourlyProfit: this.fetchAverageHourlyProfit(),
+      weeklyAverageHourlyProfit: this.fetchWeeklyAverageHourlyProfit(),
       open: this.fetchOpenBets(),
       commissionPaidToday: this.fetchCommissionPaidToday(),
       commissionPaidThisWeek: this.fetchCommissionPaidThisWeek(),
       upcomingRaces: this.fetchUpcomingRaces(),
     }).pipe(
-      map(({ normal, snowball, inplay, averageHourlyProfit, open, commissionPaidToday, commissionPaidThisWeek, upcomingRaces }) => ({
+      map(({ normal, snowball, inplay, averageHourlyProfit, weeklyAverageHourlyProfit, open, commissionPaidToday, commissionPaidThisWeek, upcomingRaces }) => ({
         normalProfit: normal.profit,
         normalWeekToDateProfit: normal.weekToDateProfit,
         normalCashout: normal.cashoutValue,
@@ -476,6 +496,7 @@ export class ProfitService {
         inplayWeekToDateHourlyProfit: inplay.weekToDateHourlyProfit,
         inplayStale: inplay.stale,
         averageHourlyProfit,
+        weeklyAverageHourlyProfit,
         openStake: open.openStake,
         openAverageProfit: open.openAverageProfit,
         openLayValue: open.openLayValue,

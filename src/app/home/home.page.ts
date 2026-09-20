@@ -61,6 +61,7 @@ export class HomePage implements OnInit, OnDestroy {
     inplayWeekToDateHourlyProfit: [],
     inplayStale: false,
     averageHourlyProfit: [],
+    weeklyAverageHourlyProfit: [],
     openStake: null,
     openAverageProfit: null,
     openLayValue: null,
@@ -76,9 +77,11 @@ export class HomePage implements OnInit, OnDestroy {
   todayGrossSparklinePoints: HourlyProfitPoint[] = [];
   todayAverageProfitSparklinePoints: HourlyProfitPoint[] = [];
   weekGrossSparklinePoints: HourlyProfitPoint[] = [];
+  weekAverageProfitSparklinePoints: HourlyProfitPoint[] = [];
   todayGrossSparklinePath = '';
   todayAverageProfitSparklinePath = '';
   weekGrossSparklinePath = '';
+  weekAverageProfitSparklinePath = '';
   todayGrossBaselineY: number | null = null;
   weekGrossBaselineY: number | null = null;
 
@@ -315,6 +318,7 @@ export class HomePage implements OnInit, OnDestroy {
     );
 
     const todayAverage = this.toCumulative(this.data.averageHourlyProfit);
+    const weekAverage = this.toCumulative(this.data.weeklyAverageHourlyProfit);
     const chartValues = [...todayMerged, ...todayAverage]
       .map(point => point.profit)
       .filter((profit): profit is number => typeof profit === 'number');
@@ -332,17 +336,31 @@ export class HomePage implements OnInit, OnDestroy {
     const valueDomain = chartValues.length > 0
       ? { min: Math.min(...chartValues), max: Math.max(...chartValues) }
       : undefined;
+    const weekValues = [...weekMerged, ...weekAverage]
+      .map(point => point.profit)
+      .filter((profit): profit is number => typeof profit === 'number');
+    const weekStart = new Date(`${todayDate}T00:00:00Z`);
+    weekStart.setUTCDate(weekStart.getUTCDate() - ((weekStart.getUTCDay() + 6) % 7));
+    const weekTimestampDomain = {
+      min: weekStart.getTime(),
+      max: weekStart.getTime() + (7 * 24 * 60 * 60 * 1000) - 1000,
+    };
+    const weekValueDomain = weekValues.length > 0
+      ? { min: Math.min(...weekValues), max: Math.max(...weekValues) }
+      : undefined;
 
     this.todayGrossSparklinePoints = todayMerged;
     this.todayAverageProfitSparklinePoints = todayAverage;
     this.weekGrossSparklinePoints = weekMerged;
+    this.weekAverageProfitSparklinePoints = weekAverage;
 
     this.todayGrossSparklinePath = this.buildSparklinePath(todayMerged, 100, 28, timestampDomain, valueDomain);
     this.todayAverageProfitSparklinePath = this.buildSparklinePath(todayAverage, 100, 28, timestampDomain, valueDomain);
-    this.weekGrossSparklinePath = this.buildSparklinePath(weekMerged);
+    this.weekGrossSparklinePath = this.buildSparklinePath(weekMerged, 100, 28, weekTimestampDomain, weekValueDomain);
+    this.weekAverageProfitSparklinePath = this.buildSparklinePath(weekAverage, 100, 28, weekTimestampDomain, weekValueDomain);
 
     this.todayGrossBaselineY = this.calculateBaselineY([...todayMerged, ...todayAverage]);
-    this.weekGrossBaselineY = this.calculateBaselineY(weekMerged);
+    this.weekGrossBaselineY = this.calculateBaselineY([...weekMerged, ...weekAverage]);
   }
 
   handleTouchStart(event: TouchEvent) {

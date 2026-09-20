@@ -192,6 +192,7 @@
               <div class="gross-sparkline" *ngIf="weekGrossSparklinePoints.length > 0">
                 <svg viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true">
                   <path *ngIf="weekGrossBaselineY !== null" class="sparkline-baseline" [attr.d]="'M0 ' + weekGrossBaselineY + ' L100 ' + weekGrossBaselineY"></path>
+                  <path *ngIf="weekAverageProfitSparklinePath" [attr.d]="weekAverageProfitSparklinePath" fill="none" stroke="rgba(255, 255, 255, 0.72)" stroke-width="1" stroke-dasharray="2 2" stroke-linecap="round" stroke-linejoin="round"></path>
                   <path *ngIf="weekGrossSparklinePath" class="sparkline-line" [attr.d]="weekGrossSparklinePath"></path>
                 </svg>
               </div>
