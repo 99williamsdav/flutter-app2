@@ -28,7 +28,7 @@
               <div class="gross-sparkline" *ngIf="todayGrossSparklinePoints.length > 0">
                 <svg viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true">
                   <path *ngIf="todayGrossBaselineY !== null" class="sparkline-baseline" [attr.d]="'M0 ' + todayGrossBaselineY + ' L100 ' + todayGrossBaselineY"></path>
-                  <path *ngIf="todayAverageProfitSparklinePath" [attr.d]="todayAverageProfitSparklinePath" fill="none" stroke="rgba(255, 255, 255, 0.72)" stroke-width="1" stroke-dasharray="6 3" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path *ngIf="todayAverageProfitSparklinePath" [attr.d]="todayAverageProfitSparklinePath" fill="none" stroke="rgba(255, 255, 255, 0.72)" stroke-width="1" stroke-dasharray="2 2" stroke-linecap="round" stroke-linejoin="round"></path>
                   <path *ngIf="todayGrossSparklinePath" class="sparkline-line" [attr.d]="todayGrossSparklinePath"></path>
                 </svg>
               </div>
