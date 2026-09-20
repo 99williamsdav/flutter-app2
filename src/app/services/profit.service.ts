@@ -61,6 +61,7 @@ export interface ProfitData {
   inplayHourlyProfit: HourlyProfitPoint[];
   inplayWeekToDateHourlyProfit: HourlyProfitPoint[];
   inplayStale: boolean;
+  averageHourlyProfit: HourlyProfitPoint[];
   openStake: number | null;
   openAverageProfit: number | null;
   openLayValue: number | null;
@@ -101,6 +102,13 @@ export class ProfitService {
 
   private getToday(): string {
     return this.formatDate(this.getUkDateParts());
+  }
+
+  private getUkWeekday(): string {
+    return new Intl.DateTimeFormat('en-GB', {
+      timeZone: this.ukTimeZone,
+      weekday: 'long',
+    }).format(new Date());
   }
 
   private getStartOfWeek(): string {
@@ -260,6 +268,36 @@ export class ProfitService {
     );
   }
 
+  /**
+   * The averages endpoint returns one mean NetProfit value for each race hour.
+   * Keep the historical start date fixed so the comparison always uses the
+   * same population, while selecting the current UK weekday.
+   */
+  private fetchAverageHourlyProfit(): Observable<HourlyProfitPoint[]> {
+    const today = this.getToday();
+    const weekday = this.getUkWeekday();
+    const url = `${this.flutterbotBase}/averages?df=2018-10-29&overround=false&filterGrouping=DayOfWeek&filterValue=${encodeURIComponent(weekday)}`;
+
+    return this.http.get<any[]>(url).pipe(
+      map(rows => (Array.isArray(rows) ? rows : [])
+        .map(row => {
+          const hour = typeof row?.Bucket === 'number' ? row.Bucket : Number(row?.Bucket);
+          const profit = row?.NetProfit;
+          if (!Number.isInteger(hour) || hour < 0 || hour > 23 || typeof profit !== 'number') {
+            return null;
+          }
+
+          return {
+            bucket: `${today}T${String(hour).padStart(2, '0')}:00:00Z`,
+            profit,
+          };
+        })
+        .filter((point): point is { bucket: string; profit: number } => point !== null)
+        .sort((a, b) => Date.parse(a.bucket) - Date.parse(b.bucket))),
+      catchError(() => of([]))
+    );
+  }
+
   private fetchOpenBets(): Observable<{ openStake: number | null; openAverageProfit: number | null; openLayValue: number | null }> {
     const url = `${this.flutterbotBase}/open`;
     return this.http.get<OpenPosition[]>(url).pipe(
@@ -409,12 +447,13 @@ export class ProfitService {
       normal: this.fetchStats(this.flutterbotBase, '', today, today),
       snowball: this.fetchStats(this.snowballBase, '', today, today),
       inplay: this.fetchStats(this.flutterbotBase, 'InPlay: true, ', today, today),
+      averageHourlyProfit: this.fetchAverageHourlyProfit(),
       open: this.fetchOpenBets(),
       commissionPaidToday: this.fetchCommissionPaidToday(),
       commissionPaidThisWeek: this.fetchCommissionPaidThisWeek(),
       upcomingRaces: this.fetchUpcomingRaces(),
     }).pipe(
-      map(({ normal, snowball, inplay, open, commissionPaidToday, commissionPaidThisWeek, upcomingRaces }) => ({
+      map(({ normal, snowball, inplay, averageHourlyProfit, open, commissionPaidToday, commissionPaidThisWeek, upcomingRaces }) => ({
         normalProfit: normal.profit,
         normalWeekToDateProfit: normal.weekToDateProfit,
         normalCashout: normal.cashoutValue,
@@ -436,6 +475,7 @@ export class ProfitService {
         inplayHourlyProfit: inplay.hourlyProfit,
         inplayWeekToDateHourlyProfit: inplay.weekToDateHourlyProfit,
         inplayStale: inplay.stale,
+        averageHourlyProfit,
         openStake: open.openStake,
         openAverageProfit: open.openAverageProfit,
         openLayValue: open.openLayValue,

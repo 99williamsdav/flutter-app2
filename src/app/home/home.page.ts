@@ -60,6 +60,7 @@ export class HomePage implements OnInit, OnDestroy {
     inplayHourlyProfit: [],
     inplayWeekToDateHourlyProfit: [],
     inplayStale: false,
+    averageHourlyProfit: [],
     openStake: null,
     openAverageProfit: null,
     openLayValue: null,
@@ -73,8 +74,10 @@ export class HomePage implements OnInit, OnDestroy {
   };
 
   todayGrossSparklinePoints: HourlyProfitPoint[] = [];
+  todayAverageProfitSparklinePoints: HourlyProfitPoint[] = [];
   weekGrossSparklinePoints: HourlyProfitPoint[] = [];
   todayGrossSparklinePath = '';
+  todayAverageProfitSparklinePath = '';
   weekGrossSparklinePath = '';
   todayGrossBaselineY: number | null = null;
   weekGrossBaselineY: number | null = null;
@@ -211,7 +214,13 @@ export class HomePage implements OnInit, OnDestroy {
     return height - ratio * height;
   }
 
-  private buildSparklinePath(points: HourlyProfitPoint[], width = 100, height = 28): string {
+  private buildSparklinePath(
+    points: HourlyProfitPoint[],
+    width = 100,
+    height = 28,
+    timestampDomain?: { min: number; max: number },
+    valueDomain?: { min: number; max: number }
+  ): string {
     const validPoints = points
       .map(point => {
         const timestamp = Date.parse(point.bucket);
@@ -234,10 +243,10 @@ export class HomePage implements OnInit, OnDestroy {
     const timestamps = validPoints.map(point => point.timestamp);
     const values = validPoints.map(point => point.profit);
 
-    const minTimestamp = Math.min(...timestamps);
-    const maxTimestamp = Math.max(...timestamps);
-    const minValue = Math.min(...values);
-    const maxValue = Math.max(...values);
+    const minTimestamp = timestampDomain?.min ?? Math.min(...timestamps);
+    const maxTimestamp = timestampDomain?.max ?? Math.max(...timestamps);
+    const minValue = valueDomain?.min ?? Math.min(...values);
+    const maxValue = valueDomain?.max ?? Math.max(...values);
 
     const xAt = (timestamp: number): number => {
       if (maxTimestamp === minTimestamp) {
@@ -305,13 +314,34 @@ export class HomePage implements OnInit, OnDestroy {
       )
     );
 
+    const todayAverage = this.toCumulative(this.data.averageHourlyProfit);
+    const chartValues = [...todayMerged, ...todayAverage]
+      .map(point => point.profit)
+      .filter((profit): profit is number => typeof profit === 'number');
+    const todayDate = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/London',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+    const chartStart = Date.parse(`${todayDate}T00:00:00Z`);
+    const chartEnd = Date.parse(`${todayDate}T23:59:59Z`);
+    const timestampDomain = Number.isNaN(chartStart) || Number.isNaN(chartEnd)
+      ? undefined
+      : { min: chartStart, max: chartEnd };
+    const valueDomain = chartValues.length > 0
+      ? { min: Math.min(...chartValues), max: Math.max(...chartValues) }
+      : undefined;
+
     this.todayGrossSparklinePoints = todayMerged;
+    this.todayAverageProfitSparklinePoints = todayAverage;
     this.weekGrossSparklinePoints = weekMerged;
 
-    this.todayGrossSparklinePath = this.buildSparklinePath(todayMerged);
+    this.todayGrossSparklinePath = this.buildSparklinePath(todayMerged, 100, 28, timestampDomain, valueDomain);
+    this.todayAverageProfitSparklinePath = this.buildSparklinePath(todayAverage, 100, 28, timestampDomain, valueDomain);
     this.weekGrossSparklinePath = this.buildSparklinePath(weekMerged);
 
-    this.todayGrossBaselineY = this.calculateBaselineY(todayMerged);
+    this.todayGrossBaselineY = this.calculateBaselineY([...todayMerged, ...todayAverage]);
     this.weekGrossBaselineY = this.calculateBaselineY(weekMerged);
   }
 
