@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, finalize, map, shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface StatsData {
@@ -75,6 +75,11 @@ export interface ProfitData {
   lastUpdated: Date | null;
 }
 
+interface CachedAverageSeries {
+  cachedAt: number;
+  points: HourlyProfitPoint[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -82,6 +87,11 @@ export class ProfitService {
   private readonly flutterbotBase = environment.flutterbotApiBase;
   private readonly snowballBase = environment.snowballApiBase;
   private readonly ukTimeZone = 'Europe/London';
+  private readonly dailyAverageCacheKey = 'flutterbot.daily-average-profit';
+  private readonly weeklyAverageCacheKey = 'flutterbot.weekly-average-profit';
+  private readonly weeklyAverageCacheLifetimeMs = 7 * 24 * 60 * 60 * 1000;
+  private dailyAverageRequest?: { date: string; result$: Observable<HourlyProfitPoint[]> };
+  private weeklyAverageRequest$?: Observable<HourlyProfitPoint[]>;
 
   constructor(private http: HttpClient) {}
 
@@ -110,6 +120,45 @@ export class ProfitService {
       timeZone: this.ukTimeZone,
       weekday: 'long',
     }).format(new Date());
+  }
+
+  private getCachedAverage(key: string, maxAgeMs?: number, date?: string): HourlyProfitPoint[] | null {
+    try {
+      const cached = JSON.parse(localStorage.getItem(key) ?? 'null') as (CachedAverageSeries & { date?: string }) | null;
+      const validPoints = Array.isArray(cached?.points) && cached.points.every(point =>
+        typeof point?.bucket === 'string' && !Number.isNaN(Date.parse(point.bucket)) && typeof point.profit === 'number'
+      );
+      const age = cached ? Date.now() - cached.cachedAt : Number.POSITIVE_INFINITY;
+
+      if (!cached || !validPoints || age < 0 || (maxAgeMs !== undefined && age > maxAgeMs) || (date !== undefined && cached.date !== date)) {
+        return null;
+      }
+
+      return cached.points;
+    } catch {
+      return null;
+    }
+  }
+
+  private cacheAverage(key: string, points: HourlyProfitPoint[], date?: string): void {
+    try {
+      localStorage.setItem(key, JSON.stringify({ cachedAt: Date.now(), date, points }));
+    } catch {
+      // Storage can be unavailable or full; the live request remains usable.
+    }
+  }
+
+  /** Replaces the source week's dates so cached values always align with the current week. */
+  private alignWeeklyAverageToCurrentWeek(points: HourlyProfitPoint[]): HourlyProfitPoint[] {
+    const weekStart = Date.parse(`${this.getStartOfWeek()}T00:00:00Z`);
+    return points.map(point => {
+      const sourceDate = new Date(point.bucket);
+      const hourFromMonday = ((sourceDate.getUTCDay() + 6) % 7) * 24 + sourceDate.getUTCHours();
+      return {
+        bucket: new Date(weekStart + hourFromMonday * 60 * 60 * 1000).toISOString(),
+        profit: point.profit,
+      };
+    });
   }
 
   private getStartOfWeek(): string {
@@ -276,10 +325,19 @@ export class ProfitService {
    */
   private fetchAverageHourlyProfit(): Observable<HourlyProfitPoint[]> {
     const today = this.getToday();
+    const cached = this.getCachedAverage(this.dailyAverageCacheKey, undefined, today);
+    if (cached) {
+      return of(cached);
+    }
+
+    if (this.dailyAverageRequest?.date === today) {
+      return this.dailyAverageRequest.result$;
+    }
+
     const weekday = this.getUkWeekday();
     const url = `${this.flutterbotBase}/averages?df=2018-10-29&overround=false&filterGrouping=DayOfWeek&filterValue=${encodeURIComponent(weekday)}`;
 
-    return this.http.get<any[]>(url).pipe(
+    const result$ = this.http.get<any[]>(url).pipe(
       map(rows => (Array.isArray(rows) ? rows : [])
         .map(row => {
           const hour = typeof row?.Bucket === 'number' ? row.Bucket : Number(row?.Bucket);
@@ -295,14 +353,32 @@ export class ProfitService {
         })
         .filter((point): point is { bucket: string; profit: number } => point !== null)
         .sort((a, b) => Date.parse(a.bucket) - Date.parse(b.bucket))),
-      catchError(() => of([]))
+      tap(points => this.cacheAverage(this.dailyAverageCacheKey, points, today)),
+      catchError(() => of([])),
+      finalize(() => {
+        if (this.dailyAverageRequest?.date === today) {
+          this.dailyAverageRequest = undefined;
+        }
+      }),
+      shareReplay({ bufferSize: 1, refCount: false })
     );
+    this.dailyAverageRequest = { date: today, result$ };
+    return result$;
   }
 
   private fetchWeeklyAverageHourlyProfit(): Observable<HourlyProfitPoint[]> {
+    const cached = this.getCachedAverage(this.weeklyAverageCacheKey, this.weeklyAverageCacheLifetimeMs);
+    if (cached) {
+      return of(this.alignWeeklyAverageToCurrentWeek(cached));
+    }
+
+    if (this.weeklyAverageRequest$) {
+      return this.weeklyAverageRequest$;
+    }
+
     const url = `${this.flutterbotBase}/weeklyaverages?df=2018-10-29&dsFilters=${encodeURIComponent('{"InPlay":null}')}&specialFilters=${encodeURIComponent('{}')}`;
 
-    return this.http.get<any[]>(url).pipe(
+    this.weeklyAverageRequest$ = this.http.get<any[]>(url).pipe(
       map(rows => (Array.isArray(rows) ? rows : [])
         .map(row => {
           const bucket = typeof row?.Bucket === 'string' ? row.Bucket : null;
@@ -313,8 +389,15 @@ export class ProfitService {
         })
         .filter((point): point is { bucket: string; profit: number } => point !== null)
         .sort((a, b) => Date.parse(a.bucket) - Date.parse(b.bucket))),
-      catchError(() => of([]))
+      tap(points => this.cacheAverage(this.weeklyAverageCacheKey, points)),
+      map(points => this.alignWeeklyAverageToCurrentWeek(points)),
+      catchError(() => of([])),
+      finalize(() => {
+        this.weeklyAverageRequest$ = undefined;
+      }),
+      shareReplay({ bufferSize: 1, refCount: false })
     );
+    return this.weeklyAverageRequest$;
   }
 
   private fetchOpenBets(): Observable<{ openStake: number | null; openAverageProfit: number | null; openLayValue: number | null }> {
