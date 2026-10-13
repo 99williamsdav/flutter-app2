@@ -296,6 +296,40 @@ app-home .strategy-metric-values .metric-value.side {
 	line-height: 1;
 }
 
+app-home .race-progress {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  margin: 22px 0 4px;
+  border-radius: 999px;
+  background: var(--card-border);
+}
+
+app-home .race-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--positive);
+  transition: width 400ms ease;
+}
+
+app-home .race-progress-horse {
+  position: absolute;
+  bottom: 2px;
+  width: 26px;
+  height: 20px;
+  color: var(--positive);
+  transform: translateX(-50%);
+  transition: left 400ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  app-home .race-progress-fill,
+  app-home .race-progress-horse {
+    transition: none;
+  }
+}
+
 app-home .strategy-metric-values .metric-value.main {
 	justify-self: stretch;
 	text-align: left;

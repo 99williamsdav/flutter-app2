@@ -99,6 +99,12 @@ export class HomePage implements OnInit, OnDestroy {
     private streamHealthService: StreamHealthService,
   ) {}
 
+  get raceProgressPercent(): number {
+    const { totalGBRaces, upcomingGBRaces } = this.data;
+    if (totalGBRaces <= 0) return 0;
+    return Math.min(100, Math.max(0, ((totalGBRaces - upcomingGBRaces) / totalGBRaces) * 100));
+  }
+
   get todayProfitLabel(): string {
     const now = new Date();
     const ukDate = new Intl.DateTimeFormat('en-GB', {
